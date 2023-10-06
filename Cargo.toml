@@ -1,0 +1,23 @@
+[package]
+name = "fluffer"
+description = "Fluffer 🦊 is a crate that aims to make writing Gemini apps fun and easy."
+version = "2023.9.29"
+edition = "2021"
+authors = ["catboomer"]
+
+[dependencies]
+anyhow = "1.0.75"
+async-trait = "0.1.73"
+log = "0.4.20"
+matchit = "0.7.3"
+mime_guess = "2.0.4"
+openssl = "0.10.57"
+tokio = { version = "1.32.0", features = ["full"] }
+tokio-openssl = "0.6.3"
+url = "2.4.1"
+urlencoding = "2.1.3"
+
+[dev-dependencies]
+fluffer = { path = "." }
+rand = "0.8.5"
+pretty_env_logger = "0.5.0"
