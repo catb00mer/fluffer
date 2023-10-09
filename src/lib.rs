@@ -9,6 +9,7 @@ mod context;
 mod fluff;
 mod gem_bytes;
 mod gem_call;
+mod interactive;
 
 pub use app::App;
 pub use context::Context;

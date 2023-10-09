@@ -65,6 +65,16 @@ impl GemBytes for Profile {
 }
 ```
 
+## 📜 Certificates
+
+### Server
+Fluffer looks for the files `./key.pem` (private) and `./cert.pem` (public) at
+runtime. If they can't be located, a prompt appears to
+generate a keypair interactively.
+
+There's currently no way to define an alternate path to your
+pem files.
+
 ## 🥴 Parameters and Input
 Queries in Gemini aren't one-to-one with HTTP.
 
@@ -86,14 +96,24 @@ everything else.
 To get a user's input to a route, call [`Context::input`].
 This returns the whole query line percent-decoded.
 
+``` rust
+App::default()
+    .route("/" |ctx| async {
+        ctx.input().unwrap_or("no input 😥".to_string())
+    })
+    .run()
+    .await
+    .unwrap()
+```
+
 #### Parameters
-To access a parameter, first declare it in the route path.
-Here's an example:
+To access a parameter, first declare it in the route path
+string.
 
 ``` rust
 App::default()
     .route("/page=:number" |ctx| async {
-        format!("{}", ctx.params.get("number").unwrap_or("no page number"))
+        format!("{}", ctx.params.get("number").unwrap_or("no page number 💢"))
     })
     .run()
     .await

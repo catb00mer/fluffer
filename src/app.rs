@@ -74,6 +74,8 @@ impl App {
     /// This function returns [`anyhow::Result`] if the inital setup
     /// fails. After that, all errors are logged as `debug`, and ignored.
     pub async fn run(self) -> anyhow::Result<()> {
+        crate::interactive::gen_cert();
+
         let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls())?;
         builder
             .set_private_key_file("key.pem", SslFiletype::PEM)
@@ -99,7 +101,7 @@ impl App {
 
         let acceptor = Arc::new(builder.build());
         let listener = Arc::new(TcpListener::bind("0.0.0.0:1965").await?);
-        info!("🦊 Server initialized. Listening at: {}", self.address);
+        println!("\x1b[1m🦊 Server initialized ... {}\x1b[0m", self.address);
 
         let arc_me = Arc::new(self);
 

@@ -1,16 +1,12 @@
 use fluffer::{App, Context};
 
-async fn index(ctx: Context) -> String {
-    if let Some(name) = ctx.subject_name() {
-        format!("Hello, {name}\n=> /pem Print pem")
-    } else {
-        format!("Who are you? 🥴")
-    }
+async fn subject(ctx: Context) -> String {
+    ctx.subject_name().unwrap_or("Who are you? 🥴".to_string())
 }
 
 async fn pem(ctx: Context) -> String {
     if let Some(pem) = ctx.pem() {
-        format!("Hello, {}", pem)
+        format!("{}", pem)
     } else {
         format!("Who are you? 🥴")
     }
@@ -19,7 +15,10 @@ async fn pem(ctx: Context) -> String {
 #[tokio::main]
 async fn main() {
     App::default()
-        .route("/", index)
+        .route("/", |_| async {
+            "=> /pem ctx.pem()\n=> /subject ctx.subject_name()\n"
+        })
+        .route("/subject", subject)
         .route("/pem", pem)
         .run()
         .await
