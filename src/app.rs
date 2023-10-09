@@ -100,7 +100,7 @@ impl App {
         )?;
 
         let acceptor = Arc::new(builder.build());
-        let listener = Arc::new(TcpListener::bind("0.0.0.0:1965").await?);
+        let listener = Arc::new(TcpListener::bind(&self.address).await?);
         println!("\x1b[1m🦊 App running [{}]\x1b[0m\n...", self.address);
 
         let arc_me = Arc::new(self);
