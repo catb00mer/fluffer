@@ -68,7 +68,7 @@ e.g. localhost,domain.tld,domain2.tld
                     eprintln!("{FAIL} 📜 Failed to save cert.pem: {e}");
                     return;
                 }
-                println!("{OK} 📜 Wrote key.pem");
+                println!("{OK} 📜 Wrote cert.pem");
             }
             Err(e) => {
                 eprintln!("{FAIL} 📜 Failed to create file cert.pem: {e}");
