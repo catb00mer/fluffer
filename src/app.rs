@@ -106,10 +106,18 @@ impl App {
         let arc_me = Arc::new(self);
 
         loop {
-            let (stream, addr) = listener.accept().await?;
-            let ssl = Ssl::new(acceptor.context())?;
-            let mut stream = SslStream::new(ssl, stream)?;
-            Pin::new(&mut stream).accept().await?;
+            let Ok((stream, addr)) = listener.accept().await else {
+                continue;
+            };
+            let Ok(ssl) = Ssl::new(acceptor.context()) else {
+                continue;
+            };
+            let Ok(mut stream) = SslStream::new(ssl, stream) else {
+                continue;
+            };
+            let Ok(_) = Pin::new(&mut stream).accept().await else {
+                continue;
+            };
 
             let clone_me = Arc::clone(&arc_me);
 
