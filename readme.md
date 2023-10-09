@@ -67,13 +67,16 @@ impl GemBytes for Profile {
 
 ## 📜 Certificates
 
-### Server
+### Servers
 Fluffer looks for the files `./key.pem` (private) and `./cert.pem` (public) at
 runtime. If they can't be located, a prompt appears to
 generate a keypair interactively.
 
 There's currently no way to define an alternate path to your
 pem files.
+
+### Clients
+There are a few helpful certificate functions implemented on [`Context`].
 
 ## 🥴 Parameters and Input
 Queries in Gemini aren't one-to-one with HTTP.
@@ -107,13 +110,31 @@ App::default()
 ```
 
 #### Parameters
-To access a parameter, first declare it in the route path
-string.
+To access a parameter, *you **must** declare it first* in
+the path string. Referencing an undefined parameter causes
+the connection's thread to panic.
+
+If you're unfamiliar with matchit patterns, here's a couple
+of examples:
+
+- `"/owo/:a/:b"` defines parameters `a` and `b`, e.g: `/owo/thisisa/thisisb`
+- `"/page=:n/filter=:f` defines the parameter `n`, e.g: `/page=20/filter=date`.
+
+***Things to keep in mind:***
+
+- Every parameter **must** be included in your url for the
+  route to be found.
+- Be careful where you define your parameters. It's possible
+  to consume requests intended for a different route.
+- It's more flexible to represent complex expressions as a
+  single parameter, which you parse manually inside the
+  route function.
+
 
 ``` rust
 App::default()
     .route("/page=:number" |ctx| async {
-        format!("{}", ctx.params.get("number").unwrap_or("no page number 💢"))
+        format!("{}", ctx.parameter("number").unwrap_or("no page number 💢"))
     })
     .run()
     .await

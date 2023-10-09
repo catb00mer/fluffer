@@ -9,7 +9,7 @@ async fn user(ctx: Context) -> (u8, &'static str, String) {
 }
 
 async fn params(ctx: Context) -> String {
-    format!("\n```\nctx.params() =\n{:#?}\n```", ctx.params)
+    ctx.parameter("p").to_string()
 }
 
 async fn page(ctx: Context) -> String {
@@ -21,12 +21,7 @@ async fn page(ctx: Context) -> String {
     ];
 
     // Get the page query (?p=n), or default to 1
-    let num: usize = ctx
-        .params
-        .get("p")
-        .unwrap_or(&"0".to_string())
-        .parse::<usize>()
-        .unwrap_or(0);
+    let num: usize = ctx.parameter("p").parse::<usize>().unwrap_or(0);
 
     let entries_per_page: usize = 5;
     let page: Vec<&str> = entries
@@ -59,10 +54,10 @@ async fn main() {
 
     App::default()
         .route("/", |_| async {
-            "=> /user?q=hi Query user!\n=> /params/20/30 Query map\n=> /page/0 Paging"
+            "=> /user?q=hi Input\n=> /params/20 Parameters\n=> /page/0 Paging Example"
         })
         .route("/user", user)
-        .route("/params/page=:p/delim=:d", params)
+        .route("/params/:p", params)
         .route("/page/:p", page)
         .run()
         .await

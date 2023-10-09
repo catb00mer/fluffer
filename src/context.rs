@@ -4,9 +4,9 @@ use std::collections::HashMap;
 use url::Url;
 
 pub struct Context {
-    pub url:    Url,
-    pub cert:   Option<X509>,
-    pub params: HashMap<String, String>,
+    pub url:  Url,
+    pub cert: Option<X509>,
+    params:   HashMap<String, String>,
 }
 
 impl Context {
@@ -21,9 +21,16 @@ impl Context {
         }
     }
 
+    /// Returns the value of a route parameter.
+    pub fn parameter(&self, key: &str) -> &str {
+        if let Some(p) = self.params.get(key) {
+            p.as_str()
+        } else {
+            panic!("Attempted to access an undefined route parameter: {key}");
+        }
+    }
+
     /// Returns optional user input.
-    ///
-    /// You *should* prompt the user if this returns `None`.
     pub fn input(&self) -> Option<String> {
         if let Some(query) = self.url.query() {
             if let Ok(query) = urlencoding::decode(query) {
@@ -33,7 +40,7 @@ impl Context {
         None
     }
 
-    /// Returns `subject name` field of the client's certificate.
+    /// Returns the first `subject name` entry in the client's certificate.
     ///
     /// Good for placeholder usernames if you don't care about the possibility of bad characters.
     pub fn subject_name(&self) -> Option<String> {
@@ -52,7 +59,7 @@ impl Context {
     ///
     /// You can use this string to verify clients later.
     ///
-    /// [Privacy-Enhanced Mail - Wikipedia](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail)
+    /// *More info: [Privacy-Enhanced Mail - Wikipedia](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail)*
     pub fn pem(&self) -> Option<String> {
         if let Some(cert) = &self.cert {
             match cert.public_key() {
