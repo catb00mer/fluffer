@@ -37,7 +37,7 @@ async fn page(ctx: Context) -> String {
         .collect();
 
     format!(
-        "\n```\nctx.query_map() =\n{page:#?}\n```\n\n=> /page/{} Next page\n=> /page/{} Prev page\n\n{}",
+        "```\n{page:#?}\n```\n\n=> /page/{} Next page\n=> /page/{} Prev page\n\n{}",
         num + 1,
         num.checked_sub(1).unwrap_or(0),
         if let Some(input) = ctx.input() {
