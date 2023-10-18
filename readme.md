@@ -1,6 +1,6 @@
 # 🦊 Fluffer
-Fluffer is a crate that aims to make writing Gemini apps fun
-and easy.
+Fluffer is an *experimental* crate that aims to make writing
+Gemini apps fun and easy.
 
 ## 🗼 Design
 Similar to Axum, Fluffer routes are generic functions that
@@ -10,8 +10,8 @@ There are some helpful implementations out of the box, so
 please consult [`GemBytes`] and [`Fluff`] while you
 experiment.
 
-Also, this crate has a lot of examples for you to check
-out. Including a dice roller app.
+Also, this crate has a lot of examples for you to check out.
+Including a dice roller app.
 
 Here is a basic example of a Fluffer app.
 
@@ -32,8 +32,8 @@ async fn main() {
 ```
 
 ### 💎 GemBytes
-The [`GemBytes`] trait returns a Gemini byte
-response, which is formatted like this:
+The [`GemBytes`] trait returns a Gemini byte response, which
+is formatted like this:
 
 ``` text
 <STATUS><SPACE><META>\r\n<CONTENT>
@@ -68,15 +68,16 @@ impl GemBytes for Profile {
 ## 📜 Certificates
 
 ### Servers
-Fluffer looks for the files `./key.pem` (private) and `./cert.pem` (public) at
-runtime. If they can't be located, a prompt appears to
-generate a keypair interactively.
+Fluffer looks for the files `./key.pem` (private) and
+`./cert.pem` (public) at runtime. If they can't be located,
+a prompt appears to generate a keypair interactively.
 
 There's currently no way to define an alternate path to your
 pem files.
 
 ### Clients
-There are a few helpful certificate functions implemented on [`Context`].
+There are a few helpful certificate functions implemented on
+[`Context`].
 
 ## 🥴 Parameters and Input
 Queries in Gemini aren't one-to-one with HTTP.
@@ -114,6 +115,16 @@ To access a parameter, *you **must** declare it first* in
 the path string. Referencing an undefined parameter causes
 the connection's thread to panic.
 
+``` rust
+App::default()
+    .route("/page=:number" |ctx| async {
+        format!("{}", ctx.parameter("number").unwrap_or("no page number 💢"))
+    })
+    .run()
+    .await
+    .unwrap()
+```
+
 If you're unfamiliar with matchit patterns, here's a couple
 of examples:
 
@@ -129,17 +140,6 @@ of examples:
 - It's more flexible to represent complex expressions as a
   single parameter, which you parse manually inside the
   route function.
-
-
-``` rust
-App::default()
-    .route("/page=:number" |ctx| async {
-        format!("{}", ctx.parameter("number").unwrap_or("no page number 💢"))
-    })
-    .run()
-    .await
-    .unwrap()
-```
 
 ## 📚 Helpful Resources
 * [Gemini spec](https://gemini.circumlunar.space/docs/specification.gmi)
