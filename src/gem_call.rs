@@ -5,7 +5,7 @@ use std::{
 };
 
 #[async_trait]
-pub trait GemCall: Send + Sync {
+pub trait GemCall {
     /// Get the bytes from the route function.
     async fn gem_call(&self, context: Context) -> Vec<u8>;
 }

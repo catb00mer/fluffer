@@ -1,6 +1,5 @@
-use std::fmt::Display;
-
 use crate::async_trait;
+use std::fmt::Display;
 
 /// 💎 A trait implemented on types that can be returned as a Gemini response.
 #[async_trait]
@@ -72,13 +71,6 @@ where
         format!("{} {}\r\n", self.0, self.1).into_bytes()
     }
 }
-
-// /// 💎 An implementation of GemBytes for vectors which already contain a Gemini byte response.
-// impl GemBytes for Vec<u8> {
-//     fn gem_bytes(self) -> Vec<u8> {
-//         self.clone()
-//     }
-// }
 
 /// 💎 An implementation of GemBytes which returns `&str` as gemtext.
 #[async_trait]
