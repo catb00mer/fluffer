@@ -50,7 +50,7 @@ impl GemBytes for Fluff {
         match self {
             Fluff::File(path) => {
                 // Sanitize path
-                let path = format!("static/{}", path.replace("..", "").replace("./", ""));
+                let path = format!("static/{}", sanitize_filename::sanitize(path));
 
                 // Open file
                 let Ok(mut file) = File::open(&path) else {
