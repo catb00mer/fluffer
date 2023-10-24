@@ -99,11 +99,11 @@ impl App {
                 .as_bytes(),
         )?;
 
-        let acceptor = Arc::new(builder.build());
-        let listener = Arc::new(TcpListener::bind(&self.address).await?);
+        let acceptor = builder.build();
+        let listener = TcpListener::bind(&self.address).await?;
         println!("\x1b[1m🦊 App running [{}]\x1b[0m\n...", self.address);
 
-        let arc_me = Arc::new(self);
+        let self_arc = Arc::new(self);
 
         loop {
             let Ok((stream, addr)) = listener.accept().await else {
@@ -112,17 +112,13 @@ impl App {
             let Ok(ssl) = Ssl::new(acceptor.context()) else {
                 continue;
             };
-            let Ok(mut stream) = SslStream::new(ssl, stream) else {
+            let Ok(stream) = SslStream::new(ssl, stream) else {
                 continue;
             };
-            let Ok(_) = Pin::new(&mut stream).accept().await else {
-                continue;
-            };
-
-            let clone_me = Arc::clone(&arc_me);
+            let self_clone = Arc::clone(&self_arc);
 
             tokio::spawn(async move {
-                match clone_me.handle_stream(stream, addr).await {
+                match self_clone.handle_stream(stream, addr).await {
                     Ok(_) => (),
                     Err(e) => debug!("🦊 Stream error: {e}"),
                 }
@@ -135,6 +131,8 @@ impl App {
         mut stream: SslStream<TcpStream>,
         addr: SocketAddr,
     ) -> anyhow::Result<()> {
+        Pin::new(&mut stream).accept().await?;
+
         // 📖 Stream to bytes
         let mut read_bytes: [u8; 1026] = [0; 1026];
         let n = stream.read(&mut read_bytes).await?;
