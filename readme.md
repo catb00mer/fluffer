@@ -67,17 +67,26 @@ impl GemBytes for Profile {
 
 ## 📜 Certificates
 
-### Servers
+### Server
 Fluffer looks for the files `./key.pem` (private) and
 `./cert.pem` (public) at runtime. If they can't be located,
-a prompt appears to generate a keypair interactively.
+a prompt appears to generate a key pair interactively.
 
 There's currently no way to define an alternate path to your
 pem files.
 
-### Clients
-There are a few helpful certificate functions implemented on
-[`Context`].
+### Client identity
+Gemini uses client certificates to facilitate identities.
+
+[`Context`] has three functions which correspond to
+common identity practices in Gemini.
+
+* [`Context::ident_get`] gets the client's certificate.
+* [`Context::ident_verify`] returns true if the current
+  client's certificate matches one you pass.
+* [`Context::ident_name`] returns the first entry in the
+  certificate's `subject_name` field. This can be used to
+  provide temporary usernames, or just to say hello.
 
 ## 🥴 Parameters and Input
 Queries in Gemini aren't one-to-one with HTTP.

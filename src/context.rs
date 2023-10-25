@@ -4,9 +4,9 @@ use std::collections::HashMap;
 use url::Url;
 
 pub struct Context {
-    pub url:  Url,
-    pub cert: Option<X509>,
-    params:   HashMap<String, String>,
+    pub url: Url,
+    cert:    Option<X509>,
+    params:  HashMap<String, String>,
 }
 
 impl Context {
@@ -40,10 +40,45 @@ impl Context {
         None
     }
 
+    /// Returns the client's pem-encoded certificate.
+    ///
+    /// Can be used to identify clients again later.
+    ///
+    /// *More info: [Privacy-Enhanced Mail - Wikipedia](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail)*
+    pub fn ident_get(&self) -> Option<String> {
+        if let Some(cert) = &self.cert {
+            match cert.to_pem() {
+                Ok(bytes) => match std::str::from_utf8(&bytes) {
+                    Ok(s) => return Some(s.to_string()),
+                    Err(e) => debug!("📜 pem certificate isn't valid utf-8 :: {e}"),
+                },
+                Err(e) => debug!("📜 Failed to serialize cert into pem :: {e}"),
+            }
+        }
+        None
+    }
+
+    /// Returns true if the certificate was signed by this client's public key.
+    pub fn ident_verify(&self, other_cert: &str) -> bool {
+        match X509::from_pem(other_cert.as_bytes()) {
+            Ok(other_cert) => {
+                if let Some(cert) = &self.cert {
+                    if let Ok(other_cert) = other_cert.public_key() {
+                        if let Ok(is_verified) = cert.verify(&other_cert) {
+                            return is_verified;
+                        }
+                    }
+                }
+            }
+            Err(e) => error!("📜 Couldn't deserialize certificate string in identity_match(): {e}"),
+        }
+        false
+    }
+
     /// Returns the first `subject name` entry in the client's certificate.
     ///
     /// Good for placeholder usernames if you don't care about the possibility of bad characters.
-    pub fn subject_name(&self) -> Option<String> {
+    pub fn ident_name(&self) -> Option<String> {
         if let Some(cert) = &self.cert {
             if let Some(entry) = cert.subject_name().entries().next() {
                 match entry.data().as_utf8() {
@@ -53,35 +88,5 @@ impl Context {
             }
         }
         None
-    }
-
-    /// Returns client's pem-encoded public key.
-    ///
-    /// You can use this string to verify clients later.
-    ///
-    /// *More info: [Privacy-Enhanced Mail - Wikipedia](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail)*
-    pub fn pem(&self) -> Option<String> {
-        if let Some(cert) = &self.cert {
-            match cert.public_key() {
-                Ok(pkey) => match pkey.public_key_to_pem() {
-                    Ok(bytes) => match std::str::from_utf8(&bytes) {
-                        Ok(s) => return Some(s.to_string()),
-                        Err(e) => debug!("🔑 PEM-encoded key isn't valid utf-8 :: {e}"),
-                    },
-                    Err(e) => debug!("🔑 Failed to serialize key into pem :: {e}"),
-                },
-                Err(e) => debug!("🔑 Failed to get key :: {e}"),
-            }
-        }
-        None
-    }
-
-    /// Returns true if the current client's public key pem matches `other_pem`.
-    pub fn verify_pem(&self, other_pem: String) -> bool {
-        if let Some(pem) = self.pem() {
-            pem == other_pem
-        } else {
-            false
-        }
     }
 }
