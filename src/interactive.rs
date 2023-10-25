@@ -10,8 +10,8 @@ const PROMPT: &str = "\x1b[32;3m→ ";
 
 /// Interactively generate a certificate if one doesn't exist.
 pub fn gen_cert() {
-    // Exit if certificate already exists
-    if let (Ok(_), Ok(_)) = (File::open("cert.pem"), File::open("key.pem")) {
+    // Exit if either the cert or key exists
+    if File::open("cert.pem").is_ok() || File::open("key.pem").is_ok() {
         return;
     }
 

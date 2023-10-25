@@ -86,7 +86,7 @@ impl App {
         builder
             .set_certificate_file("cert.pem", SslFiletype::PEM)
             .map_err(|e| {
-                eprintln!("\x1b[31m;1m❌📜 file either missing or invalid: ./cert.pem\x1b[0m");
+                eprintln!("\x1b[31;1m❌📜 file either missing or invalid: ./cert.pem\x1b[0m");
                 e
             })?;
         builder.check_private_key()?;
