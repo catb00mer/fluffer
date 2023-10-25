@@ -10,7 +10,7 @@ pub struct Context {
 }
 
 impl Context {
-    pub fn new(url: Url, cert: Option<X509>, params: Params<'_, '_>) -> Self {
+    pub fn new(url: Url, cert: Option<X509>, params: &Params<'_, '_>) -> Self {
         Self {
             url,
             cert,

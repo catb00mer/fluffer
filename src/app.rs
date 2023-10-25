@@ -145,15 +145,13 @@ impl App {
 
         // 🔁 Get response bytes
         let response = match &self.routes.at(path.into_owned().as_str()) {
-            Ok(at) => {
+            Ok(route) => {
                 info!("{addr} :: ✅🔗 Found [{url}] ({n} bytes)");
-                let func = at.value;
-                let params = at.params.clone();
 
                 // 💬 Create context
-                let ctx = Context::new(url, stream.ssl().peer_certificate(), params);
+                let ctx = Context::new(url, stream.ssl().peer_certificate(), &route.params);
 
-                func.gem_call(ctx).await
+                route.value.gem_call(ctx).await
             }
             Err(e) => {
                 info!("{addr} :: ❌🔗 Not found [{url}] :: {e}");
