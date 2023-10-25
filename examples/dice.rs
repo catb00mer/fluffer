@@ -97,10 +97,12 @@ async fn roll(ctx: Context) -> Result<Fluff, RollError> {
         }
     };
 
-    // Split roll inputession (e.g 1d4)
+    // Split roll expression (e.g 1d4)
     let Some((roll_count, sides)) = input.rsplit_once('d') else {
         return Err(RollError::BadRoll);
     };
+
+    let (roll_count, sides) = (roll_count.trim(), sides.trim());
 
     // Parse both parts of the split into i32
     let roll_count = roll_count.parse::<i32>().unwrap_or(1);
