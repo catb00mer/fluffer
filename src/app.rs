@@ -1,4 +1,4 @@
-use crate::{gem_call::GemCall, Context, GemBytes};
+use crate::{error::AppErr, gem_call::GemCall, Context, GemBytes};
 use matchit::Router;
 use openssl::ssl::{Ssl, SslAcceptor, SslFiletype, SslMethod, SslVerifyMode};
 use std::{net::SocketAddr, pin::Pin, sync::Arc, time};
@@ -71,24 +71,18 @@ impl App {
 
     /// Enter the app loop
     ///
-    /// This function returns [`anyhow::Result`] if the inital setup
+    /// This function returns [`AppErr`] if the inital setup
     /// fails. After that, all errors are logged as `debug`, and ignored.
-    pub async fn run(self) -> anyhow::Result<()> {
+    pub async fn run(self) -> Result<(), AppErr> {
         crate::interactive::gen_cert();
 
         let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls())?;
         builder
             .set_private_key_file("key.pem", SslFiletype::PEM)
-            .map_err(|e| {
-                eprintln!("\x1b[31;1m❌🔑 file either missing or invalid: ./key.pem\x1b[0m");
-                e
-            })?;
+            .map_err(|e| AppErr::Key(e))?;
         builder
             .set_certificate_file("cert.pem", SslFiletype::PEM)
-            .map_err(|e| {
-                eprintln!("\x1b[31;1m❌📜 file either missing or invalid: ./cert.pem\x1b[0m");
-                e
-            })?;
+            .map_err(|e| AppErr::Cert(e))?;
         builder.check_private_key()?;
         builder.set_verify_callback(SslVerifyMode::PEER, |_, _| true);
         builder.set_session_id_context(
@@ -100,7 +94,10 @@ impl App {
         )?;
 
         let acceptor = builder.build();
-        let listener = TcpListener::bind(&self.address).await?;
+        let listener = TcpListener::bind(&self.address)
+            .await
+            .map_err(|e| AppErr::Bind(e))?;
+
         println!("\x1b[1m🦊 App running [{}]\x1b[0m\n...", self.address);
 
         let self_arc = Arc::new(self);
@@ -130,18 +127,22 @@ impl App {
         &self,
         mut stream: SslStream<TcpStream>,
         addr: SocketAddr,
-    ) -> anyhow::Result<()> {
+    ) -> Result<(), AppErr> {
         Pin::new(&mut stream).accept().await?;
 
         // 📖 Stream to bytes
         let mut read_bytes: [u8; 1026] = [0; 1026];
-        let n = stream.read(&mut read_bytes).await?;
+        let n = stream
+            .read(&mut read_bytes)
+            .await
+            .map_err(|e| AppErr::Read(e))?;
 
         // 🔗 Bytes to url
-        let url = Url::parse(std::str::from_utf8(&read_bytes[..n - 2])?)?;
+        let url = Url::parse(std::str::from_utf8(&read_bytes[..n - 2])?)
+            .map_err(|e| AppErr::UrlParse(e))?;
 
         // % Decode url to path
-        let path = urlencoding::decode(url.path())?;
+        let path = urlencoding::decode(url.path()).map_err(|e| AppErr::UrlDecode(e))?;
 
         // 🔁 Get response bytes
         let response = match &self.routes.at(path.into_owned().as_str()) {
@@ -160,7 +161,10 @@ impl App {
         };
 
         // 📜 Write response
-        stream.write_all(response.as_ref()).await?;
+        stream
+            .write_all(response.as_ref())
+            .await
+            .map_err(|e| AppErr::Write(e))?;
         info!("{addr} :: ✅📜 Wrote response ({} bytes)", response.len());
 
         Ok(())

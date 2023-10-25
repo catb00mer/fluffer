@@ -4,9 +4,9 @@ use std::{
     io::{stdin, stdout, Write},
 };
 
-const OK: &str = "\x1b[0m\x1b[35m[fluffer]\x1b[0m";
+const OK: &str = "\x1b[0m\x1b[33m[fluffer]\x1b[0m";
 const FAIL: &str = "\x1b[31m[fluffer]\x1b[0m";
-const PROMPT: &str = "\x1b[32;3m→ ";
+const PROMPT: &str = "\x1b[33;3m→ ";
 
 /// Interactively generate a certificate if one doesn't exist.
 pub fn gen_cert() {
