@@ -8,14 +8,6 @@ pub trait GemBytes {
     async fn gem_bytes(self) -> Vec<u8>;
 }
 
-/// 💎 Support boxed values
-#[async_trait]
-impl GemBytes for Box<dyn GemBytes + Sync + Send> {
-    async fn gem_bytes(self) -> Vec<u8> {
-        self.gem_bytes().await
-    }
-}
-
 /// 💎 An implementation for Result, where both Ok and Err implement GemBytes
 #[async_trait]
 impl<T, E> GemBytes for Result<T, E>
