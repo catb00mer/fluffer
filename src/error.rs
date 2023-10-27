@@ -1,8 +1,5 @@
 #[derive(thiserror::Error, Debug)]
 pub enum AppErr {
-    #[error("Generic: {0}")]
-    Generic(String),
-
     #[error("./cert.pem is missing or corrupt: {0}")]
     Cert(openssl::error::ErrorStack),
 
@@ -12,6 +9,18 @@ pub enum AppErr {
     #[error("Fluffer failed to bind address: {0}")]
     Bind(std::io::Error),
 
+    #[error(transparent)]
+    SslStack(#[from] openssl::error::ErrorStack),
+
+    #[error(transparent)]
+    SslError(#[from] openssl::ssl::Error),
+
+    #[error(transparent)]
+    Time(#[from] std::time::SystemTimeError),
+}
+
+#[derive(thiserror::Error, Debug)]
+pub enum StreamErr {
     #[error("📚 Reading stream: {0}")]
     Read(std::io::Error),
 
@@ -28,11 +37,5 @@ pub enum AppErr {
     Utf8(#[from] std::str::Utf8Error),
 
     #[error(transparent)]
-    SslStack(#[from] openssl::error::ErrorStack),
-
-    #[error(transparent)]
     SslError(#[from] openssl::ssl::Error),
-
-    #[error(transparent)]
-    Time(#[from] std::time::SystemTimeError),
 }

@@ -1,4 +1,8 @@
-use crate::{error::AppErr, gem_call::GemCall, Context, GemBytes};
+use crate::{
+    error::{AppErr, StreamErr},
+    gem_call::GemCall,
+    Context, GemBytes,
+};
 use matchit::Router;
 use openssl::ssl::{Ssl, SslAcceptor, SslFiletype, SslMethod, SslVerifyMode};
 use std::{net::SocketAddr, pin::Pin, sync::Arc, time};
@@ -98,7 +102,7 @@ impl App {
             .await
             .map_err(|e| AppErr::Bind(e))?;
 
-        println!("\x1b[1m🦊 App running [{}]\x1b[0m\n...", self.address);
+        println!("🦊 App running [{}]", self.address);
 
         let self_arc = Arc::new(self);
 
@@ -127,7 +131,7 @@ impl App {
         &self,
         mut stream: SslStream<TcpStream>,
         addr: SocketAddr,
-    ) -> Result<(), AppErr> {
+    ) -> Result<(), StreamErr> {
         Pin::new(&mut stream).accept().await?;
 
         // 📖 Stream to bytes
@@ -135,14 +139,14 @@ impl App {
         let n = stream
             .read(&mut read_bytes)
             .await
-            .map_err(|e| AppErr::Read(e))?;
+            .map_err(|e| StreamErr::Read(e))?;
 
         // 🔗 Bytes to url
         let url = Url::parse(std::str::from_utf8(&read_bytes[..n - 2])?)
-            .map_err(|e| AppErr::UrlParse(e))?;
+            .map_err(|e| StreamErr::UrlParse(e))?;
 
         // % Decode url to path
-        let path = urlencoding::decode(url.path()).map_err(|e| AppErr::UrlDecode(e))?;
+        let path = urlencoding::decode(url.path()).map_err(|e| StreamErr::UrlDecode(e))?;
 
         // 🔁 Get response bytes
         let response = match &self.routes.at(path.into_owned().as_str()) {
@@ -164,7 +168,8 @@ impl App {
         stream
             .write_all(response.as_ref())
             .await
-            .map_err(|e| AppErr::Write(e))?;
+            .map_err(|e| StreamErr::Write(e))?;
+
         info!("{addr} :: ✅📜 Wrote response ({} bytes)", response.len());
 
         Ok(())
