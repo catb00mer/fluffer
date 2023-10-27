@@ -78,12 +78,15 @@ pem files.
 ### Client identity
 Gemini uses client certificates to facilitate identities.
 
-[`Context`] has three functions which correspond to
-common identity practices in Gemini.
+[`Context`] exposes functions with the `ident_` prefix,
+which correspond to common identity practices in Gemini.
 
 * [`Context::ident_get`] gets the client's certificate.
 * [`Context::ident_verify`] returns true if the current
   client's certificate matches one you pass.
+* [`Context::ident_name`] returns the first entry in the
+  certificate's `subject_name` field. This can be used to
+  provide temporary usernames, or just to say hello.
 * [`Context::ident_name`] returns the first entry in the
   certificate's `subject_name` field. This can be used to
   provide temporary usernames, or just to say hello.

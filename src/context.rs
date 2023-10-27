@@ -1,5 +1,5 @@
 use matchit::Params;
-use openssl::x509::X509;
+use openssl::{asn1::Asn1Time, x509::X509};
 use std::collections::HashMap;
 use url::Url;
 
@@ -50,9 +50,9 @@ impl Context {
             match cert.to_pem() {
                 Ok(bytes) => match std::str::from_utf8(&bytes) {
                     Ok(s) => return Some(s.to_string()),
-                    Err(e) => debug!("📜 pem certificate isn't valid utf-8 :: {e}"),
+                    Err(e) => debug!("Certificate pem isn't valid utf-8 :: {e}"),
                 },
-                Err(e) => debug!("📜 Failed to serialize cert into pem :: {e}"),
+                Err(e) => debug!("Failed to serialize certificate :: {e}"),
             }
         }
         None
@@ -70,7 +70,7 @@ impl Context {
                     }
                 }
             }
-            Err(e) => error!("📜 Couldn't deserialize certificate string in identity_match(): {e}"),
+            Err(e) => debug!("Deserializing certificate string :: {e}"),
         }
         false
     }
@@ -83,10 +83,29 @@ impl Context {
             if let Some(entry) = cert.subject_name().entries().next() {
                 match entry.data().as_utf8() {
                     Ok(name) => return Some(name.to_string()),
-                    Err(e) => debug!("Couldn't parse name into utf8: {e}"),
+                    Err(e) => debug!("Couldn't parse name into utf8 :: {e}"),
                 }
             }
         }
         None
+    }
+
+    /// Returns true if the client's certificate is expired.
+    ///
+    /// Will also return true if there's no certificate, or if an error occurs while checking the
+    /// dates.
+    pub fn ident_expired(&self) -> bool {
+        if let Some(cert) = &self.cert {
+            match Asn1Time::days_from_now(0) {
+                Ok(today) => match cert.not_after().compare(&today) {
+                    Ok(cmp) => return cmp.is_le(),
+                    Err(e) => debug!("📅 Comparing expiration with today :: {e}"),
+                },
+                Err(e) => {
+                    error!("📅 Creating Asn1Time object from today's date :: {e}")
+                }
+            }
+        }
+        true
     }
 }

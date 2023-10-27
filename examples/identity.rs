@@ -37,6 +37,14 @@ UDhrx+oupwUUcYnSaTR3gP44+IPU05mYLI6Pf3RiNP02u5ztpTpHS91nBNrx
     }
 }
 
+async fn expired(ctx: Context) -> String {
+    if ctx.ident_expired() {
+        format!("Your certificate is expired :(",)
+    } else {
+        "Your certificate is fine! :D".to_string()
+    }
+}
+
 #[tokio::main]
 async fn main() {
     pretty_env_logger::init();
@@ -44,11 +52,13 @@ async fn main() {
         .route("/", |_| async {
             "=> /name ident_name()
 => /id ident_get()
-=> /verify ident_verify(cert)"
+=> /verify ident_verify(cert)
+=> /expired ident_expired()"
         })
         .route("/name", name)
         .route("/id", id)
         .route("/verify", verify)
+        .route("/expired", expired)
         .run()
         .await
         .unwrap();
