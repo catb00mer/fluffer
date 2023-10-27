@@ -1,5 +1,5 @@
 use crate::{
-    error::{AppErr, StreamErr},
+    err::{AppErr, StreamErr},
     gem_call::GemCall,
     Context, GemBytes,
 };
