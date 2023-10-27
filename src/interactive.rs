@@ -44,11 +44,7 @@ e.g. localhost,domain.tld,domain2.tld
     let mut dlist = String::new();
     let _ = stdin.read_line(&mut dlist);
 
-    let domains: Vec<String> = dlist
-        .split(',')
-        .into_iter()
-        .map(|d| d.trim().to_string())
-        .collect();
+    let domains: Vec<String> = dlist.split(',').map(|d| d.trim().to_string()).collect();
 
     println!("\x1b[3m{domains:#?}\x1b[0m");
 
