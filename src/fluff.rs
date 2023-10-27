@@ -54,14 +54,14 @@ impl GemBytes for Fluff {
 
                 // Open file
                 let Ok(mut file) = File::open(&path) else {
-                    return "51 📁 File not found.\r\n".to_string().into_bytes();
+                    return "51 File not found.\r\n".to_string().into_bytes();
                 };
 
                 // Guess mimetype
                 let mimetype = match mime_guess::from_path(path).first() {
                     Some(m) => m,
                     None => {
-                        return "51 📁 File mimetype could not be guessed.\r\n"
+                        return "51 File mimetype could not be guessed.\r\n"
                             .to_string()
                             .into_bytes()
                     }
@@ -76,8 +76,8 @@ impl GemBytes for Fluff {
                         v2
                     }
                     Err(e) => {
-                        debug!("📁 File read error: {e}");
-                        "51 📁 File read error.\r\n".to_string().into_bytes()
+                        debug!("File read error: {e}");
+                        "51 File read error.\r\n".to_string().into_bytes()
                     }
                 }
             }
