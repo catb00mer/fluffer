@@ -87,9 +87,9 @@ which correspond to common identity practices in Gemini.
 * [`Client::ident_name`] returns the first entry in the
   certificate's `subject_name` field. This can be used to
   provide temporary usernames, or just to say hello.
-* [`Client::ident_name`] returns the first entry in the
-  certificate's `subject_name` field. This can be used to
-  provide temporary usernames, or just to say hello.
+* [`Client::ident_expired`] returns true if there's no
+  certificate, or if the client's certificate is
+  invalid/expired.
 
 ## 🥴 Parameters and Input
 Queries in Gemini aren't one-to-one with HTTP.
