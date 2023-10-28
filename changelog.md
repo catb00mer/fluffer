@@ -23,3 +23,8 @@
   types(`examples/mult.rs`.
 * *breaking* Changed `Context` to `Client` to avoid naming conflicts with
   Tera, and other crates. sorry :(
+
+## 2023.10.28 - 0.1.1
+* Added `GemBytes` impls for `reqwest::Response` and
+  `reqwest::Result<reqwest::Response>`.
+* Added an http proxy example using `reqwest` (`example/http.rs`).
