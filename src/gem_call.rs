@@ -1,4 +1,4 @@
-use crate::{async_trait, Context, GemBytes};
+use crate::{async_trait, Client, GemBytes};
 use std::{
     future::Future,
     marker::{Send, Sync},
@@ -7,7 +7,7 @@ use std::{
 #[async_trait]
 pub trait GemCall {
     /// Get the bytes from the route function.
-    async fn gem_call(&self, context: Context) -> Vec<u8>;
+    async fn gem_call(&self, client: Client) -> Vec<u8>;
 }
 
 /// Implementation of GemCall for async functions.
@@ -21,9 +21,9 @@ where
     GF: Future<Output = G> + Send + 'static,
 
     // The function body
-    FN: Fn(Context) -> GF + Send + Sync,
+    FN: Fn(Client) -> GF + Send + Sync,
 {
-    async fn gem_call(&self, context: Context) -> Vec<u8> {
-        (self)(context).await.gem_bytes().await
+    async fn gem_call(&self, client: Client) -> Vec<u8> {
+        (self)(client).await.gem_bytes().await
     }
 }

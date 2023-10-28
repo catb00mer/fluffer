@@ -1,7 +1,7 @@
 use crate::{
     err::{AppErr, StreamErr},
     gem_call::GemCall,
-    Context, GemBytes,
+    Client, GemBytes,
 };
 use matchit::Router;
 use openssl::ssl::{Ssl, SslAcceptor, SslFiletype, SslMethod, SslVerifyMode};
@@ -153,10 +153,8 @@ impl App {
             Ok(route) => {
                 info!("{addr} :: ✅🔗 Found [{url}] ({n} bytes)");
 
-                // 💬 Create context
-                let ctx = Context::new(url, stream.ssl().peer_certificate(), &route.params);
-
-                route.value.gem_call(ctx).await
+                let client = Client::new(url, stream.ssl().peer_certificate(), &route.params);
+                route.value.gem_call(client).await
             }
             Err(e) => {
                 info!("{addr} :: ❌🔗 Not found [{url}] :: {e}");

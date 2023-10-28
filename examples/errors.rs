@@ -1,4 +1,4 @@
-use fluffer::{async_trait, App, Context, Fluff, GemBytes};
+use fluffer::{async_trait, App, Client, Fluff, GemBytes};
 
 #[derive(thiserror::Error, Debug)]
 enum CustomErr {
@@ -18,7 +18,7 @@ impl GemBytes for CustomErr {
     }
 }
 
-async fn file(_: Context) -> Result<Fluff, CustomErr> {
+async fn file(_: Client) -> Result<Fluff, CustomErr> {
     let f = std::fs::read_to_string("./static/file.rs")?; // << gets converted into CustomErr
 
     Ok(Fluff::Document {

@@ -3,13 +3,13 @@ use openssl::{asn1::Asn1Time, x509::X509};
 use std::collections::HashMap;
 use url::Url;
 
-pub struct Context {
+pub struct Client {
     pub url: Url,
     cert:    Option<X509>,
     params:  HashMap<String, String>,
 }
 
-impl Context {
+impl Client {
     pub fn new(url: Url, cert: Option<X509>, params: &Params<'_, '_>) -> Self {
         Self {
             url,

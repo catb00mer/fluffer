@@ -1,14 +1,14 @@
-use fluffer::{App, Context};
+use fluffer::{App, Client};
 
-async fn name(ctx: Context) -> String {
-    ctx.ident_name().unwrap_or("Who are you? 🥴".to_string())
+async fn name(c: Client) -> String {
+    c.ident_name().unwrap_or("Who are you? 🥴".to_string())
 }
 
-async fn id(ctx: Context) -> String {
-    ctx.ident_get().unwrap_or("Who are you? 🥴".to_string())
+async fn id(c: Client) -> String {
+    c.ident_get().unwrap_or("Who are you? 🥴".to_string())
 }
 
-async fn verify(ctx: Context) -> String {
+async fn verify(c: Client) -> String {
     // NOTE: To test this function, replace the certificate below with your own.
     let cert = "-----BEGIN CERTIFICATE-----
 MIICmTCCAYECCDxmaR4g0RXyMA0GCSqGSIb3DQEBCwUAMA4xDDAKBgNVBAMMA093
@@ -27,18 +27,18 @@ I3JmHvLxq9osKGbA3jctThPIHr324AoWWENJf33lqs8/UVxu4DTDhRlmp9g900k0
 UDhrx+oupwUUcYnSaTR3gP44+IPU05mYLI6Pf3RiNP02u5ztpTpHS91nBNrx
 -----END CERTIFICATE-----";
 
-    if ctx.ident_verify(cert) {
+    if c.ident_verify(cert) {
         format!(
             "Hey, don't I recognize you? You're, {}! :D",
-            ctx.ident_name().unwrap_or("[no name]".to_string())
+            c.ident_name().unwrap_or("[no name]".to_string())
         )
     } else {
         "I don't recognize you. Try replacing the certificate in cert.rs with your own.".to_string()
     }
 }
 
-async fn expired(ctx: Context) -> String {
-    if ctx.ident_expired() {
+async fn expired(c: Client) -> String {
+    if c.ident_expired() {
         format!("Your certificate is expired :(",)
     } else {
         "Your certificate is fine! :D".to_string()

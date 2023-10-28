@@ -5,7 +5,7 @@
 extern crate log;
 
 mod app;
-mod context;
+mod client;
 mod err;
 mod fluff;
 mod gem_bytes;
@@ -13,7 +13,7 @@ mod gem_call;
 mod interactive;
 
 pub use app::App;
-pub use context::Context;
+pub use client::Client;
 pub use err::AppErr;
 pub use fluff::Fluff;
 pub use gem_bytes::GemBytes;

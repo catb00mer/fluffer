@@ -1,18 +1,18 @@
-use fluffer::{App, Context};
+use fluffer::{App, Client};
 
-async fn user(ctx: Context) -> (u8, &'static str, String) {
-    if let Some(input) = ctx.input() {
+async fn user(c: Client) -> (u8, &'static str, String) {
+    if let Some(input) = c.input() {
         (20, "text/gemini", format!("## Input\n\n```\n{input}\n```"))
     } else {
         (10, "user input:", "".to_string())
     }
 }
 
-async fn params(ctx: Context) -> String {
-    ctx.parameter("p").to_string()
+async fn params(c: Client) -> String {
+    c.parameter("p").to_string()
 }
 
-async fn page(ctx: Context) -> String {
+async fn page(c: Client) -> String {
     let entries = vec![
         "entry 1", "entry 2", "entry 3", "entry 4", "entry 5", "entry 6", "entry 7", "entry 8",
         "entry 9", "entry 10", "entry 11", "entry 12", "entry 13", "entry 14", "entry 15",
@@ -21,7 +21,7 @@ async fn page(ctx: Context) -> String {
     ];
 
     // Get the page query (?p=n), or default to 1
-    let num: usize = ctx.parameter("p").parse::<usize>().unwrap_or(0);
+    let num: usize = c.parameter("p").parse::<usize>().unwrap_or(0);
 
     let entries_per_page: usize = 5;
     let page: Vec<&str> = entries
@@ -40,7 +40,7 @@ async fn page(ctx: Context) -> String {
         "```\n{page:#?}\n```\n\n=> /page/{} Next page\n=> /page/{} Prev page\n\n{}",
         num + 1,
         num.checked_sub(1).unwrap_or(0),
-        if let Some(input) = ctx.input() {
+        if let Some(input) = c.input() {
             format!("I got user input too!\n```\n{input}\n```\n")
         } else {
             "".to_string()

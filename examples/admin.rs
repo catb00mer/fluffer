@@ -1,4 +1,4 @@
-use fluffer::{async_trait, App, Context, Fluff, GemBytes};
+use fluffer::{async_trait, App, Client, Fluff, GemBytes};
 
 #[derive(thiserror::Error, Debug)]
 enum CustomErr {
@@ -18,7 +18,7 @@ impl GemBytes for CustomErr {
 }
 
 // Uses CustomErr to hide pages if the user isn't admin.
-fn hide(ctx: &Context) -> Result<(), CustomErr> {
+fn hide(c: &Client) -> Result<(), CustomErr> {
     // Maybe read the certificate from a file instead.
     let admin = "-----BEGIN CERTIFICATE-----
 MIICmTCCAYECCDxmaR4g0RXyMA0GCSqGSIb3DQEBCwUAMA4xDDAKBgNVBAMMA093
@@ -36,15 +36,15 @@ yfFa/hM29HqXhHvIVK0aJkn9J6DbV8UPGlasKk0mQswNNGT5mQMdKjXZGfsWkrkm
 I3JmHvLxq9osKGbA3jctThPIHr324AoWWENJf33lqs8/UVxu4DTDhRlmp9g900k0
 UDhrx+oupwUUcYnSaTR3gP44+IPU05mYLI6Pf3RiNP02u5ztpTpHS91nBNrx
 -----END CERTIFICATE-----";
-    if ctx.ident_verify(admin) {
+    if c.ident_verify(admin) {
         Ok(())
     } else {
         Err(CustomErr::Hide)
     }
 }
 
-async fn hidden_page(ctx: Context) -> Result<Fluff, CustomErr> {
-    hide(&ctx)?;
+async fn hidden_page(c: Client) -> Result<Fluff, CustomErr> {
+    hide(&c)?;
 
     Ok(Fluff::Text("yo wasuup? 😎".to_string()))
 }

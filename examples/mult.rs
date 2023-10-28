@@ -1,10 +1,10 @@
-use fluffer::{async_trait, App, Context, Fluff, GemBytes};
+use fluffer::{async_trait, App, Client, Fluff, GemBytes};
 
 // This file demonstates two valid ways to increase the number of possible return types in a route.
 
 // 1. Return Vec<u8>, and call gem_bytes() on each type before returning it.
-async fn vec(ctx: Context) -> Vec<u8> {
-    if let Some(input) = ctx.input() {
+async fn vec(c: Client) -> Vec<u8> {
+    if let Some(input) = c.input() {
         input.parse::<u32>().ok().gem_bytes().await
     } else {
         Fluff::Input("Input a number!".to_string())
@@ -29,8 +29,8 @@ impl GemBytes for Mult {
     }
 }
 
-async fn mult(ctx: Context) -> Mult {
-    if let Some(input) = ctx.input() {
+async fn mult(c: Client) -> Mult {
+    if let Some(input) = c.input() {
         Mult::OptNum(input.parse::<u32>().ok())
     } else {
         Mult::Fluff(Fluff::Input("Input a number!".to_string()))

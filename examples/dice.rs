@@ -1,4 +1,4 @@
-use fluffer::{async_trait, App, Context, Fluff, GemBytes};
+use fluffer::{async_trait, App, Client, Fluff, GemBytes};
 use rand::Rng;
 
 enum RollError {
@@ -74,9 +74,9 @@ impl std::fmt::Display for Roll {
     }
 }
 
-async fn roll(ctx: Context) -> Result<Fluff, RollError> {
+async fn roll(c: Client) -> Result<Fluff, RollError> {
     // Prompt for input
-    let Some(input) = ctx.input() else {
+    let Some(input) = c.input() else {
         return Ok(Fluff::Input(
             r#"Example Usage:
  1d20 + 1

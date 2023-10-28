@@ -78,16 +78,16 @@ pem files.
 ### Client identity
 Gemini uses client certificates to facilitate identities.
 
-[`Context`] exposes functions with the `ident_` prefix,
+[`Client`] exposes functions with the `ident_` prefix,
 which correspond to common identity practices in Gemini.
 
-* [`Context::ident_get`] gets the client's certificate.
-* [`Context::ident_verify`] returns true if the current
+* [`Client::ident_get`] gets the client's certificate.
+* [`Client::ident_verify`] returns true if the current
   client's certificate matches one you pass.
-* [`Context::ident_name`] returns the first entry in the
+* [`Client::ident_name`] returns the first entry in the
   certificate's `subject_name` field. This can be used to
   provide temporary usernames, or just to say hello.
-* [`Context::ident_name`] returns the first entry in the
+* [`Client::ident_name`] returns the first entry in the
   certificate's `subject_name` field. This can be used to
   provide temporary usernames, or just to say hello.
 
@@ -109,13 +109,13 @@ whole query as input, and [`matchit`]'s route parameters for
 everything else.
 
 #### Input
-To get a user's input to a route, call [`Context::input`].
+To get a user's input to a route, call [`Client::input`].
 This returns the whole query line percent-decoded.
 
 ``` rust
 App::default()
-    .route("/" |ctx| async {
-        ctx.input().unwrap_or("no input 😥".to_string())
+    .route("/" |c| async {
+        c.input().unwrap_or("no input 😥".to_string())
     })
     .run()
     .await
@@ -129,8 +129,8 @@ the connection's thread to panic.
 
 ``` rust
 App::default()
-    .route("/page=:number" |ctx| async {
-        format!("{}", ctx.parameter("number").unwrap_or("no page number 💢"))
+    .route("/page=:number" |c| async {
+        format!("{}", c.parameter("number").unwrap_or("no page number 💢"))
     })
     .run()
     .await
@@ -159,8 +159,8 @@ of examples:
 ## 📋 Todo
 * [X] Async for route functions
 * [X] Switch to openssl
-* [X] Add peer certificate to context
+* [X] Add peer certificate to client
 * [X] Spawn threads
-* [ ] User-defined data
+* [ ] App data
 * [ ] Titan support
 
