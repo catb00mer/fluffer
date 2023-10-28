@@ -121,3 +121,52 @@ impl GemBytes for bool {
         .into_bytes()
     }
 }
+
+/// 💎 GemBytes implementation for proxying http with [`reqwest`] without unwrapping the result.
+///
+/// Returns a descriptive(43 Proxy Error) if anything fails.
+#[async_trait]
+impl GemBytes for reqwest::Result<reqwest::Response> {
+    async fn gem_bytes(self) -> Vec<u8> {
+        // Catch Result errors
+        let response = match self {
+            Ok(o) => o,
+            Err(e) => return format!("43 http error :: {}\r\n", e.without_url()).into_bytes(),
+        };
+
+        response.gem_bytes().await
+    }
+}
+
+/// 💎 GemBytes implementation for proxying http with [`reqwest`].
+///
+/// Returns a descriptive(43 Proxy Error) if anything fails.
+#[async_trait]
+impl GemBytes for reqwest::Response {
+    async fn gem_bytes(self) -> Vec<u8> {
+        let status = self.status();
+        if status != reqwest::StatusCode::OK {
+            return format!("43 http: {status}\r\n").into_bytes();
+        }
+
+        let content_type = match self.headers().get("Content-Type") {
+            Some(o) => o,
+            None => return format!("43 http: invalid content type.\r\n").into_bytes(),
+        };
+        let content_type = match content_type.to_str() {
+            Ok(o) => o,
+            Err(_) => return format!("43 http: content type corrupted.\r\n").into_bytes(),
+        };
+
+        let mut output = format!("20 {content_type}\r\n").into_bytes();
+
+        let mut bytes = match self.bytes().await {
+            Ok(o) => o,
+            Err(e) => return format!("43 http: {}\r\n", e.without_url()).into_bytes(),
+        }
+        .to_vec();
+
+        output.append(&mut bytes);
+        output
+    }
+}
