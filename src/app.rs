@@ -39,13 +39,14 @@ use url::Url;
 /// .run()
 /// .await
 /// ```
-pub struct App {
+pub struct App<S = ()> {
+    pub state:     S,
     pub address:   String,
     pub not_found: String,
-    pub routes:    Router<Box<dyn GemCall + Send + Sync>>,
+    pub routes:    Router<Box<dyn GemCall<S> + Send + Sync>>,
 }
 
-impl Default for App {
+impl Default for App<()> {
     fn default() -> Self {
         let address = std::env::var("FLUFFER_ADDRESS").unwrap_or_else(|e| {
             warn!("❕ {e}: FLUFFER_ADDRESS. Defaulting to `127.0.0.1:1965`...");
@@ -55,6 +56,7 @@ impl Default for App {
         let not_found = String::from("🦊 Page not found.");
 
         Self {
+            state: (),
             address,
             not_found,
             routes: Router::default(),
@@ -62,15 +64,26 @@ impl Default for App {
     }
 }
 
-impl App {
+impl<S> App<S>
+where
+    S: Send + Sync + Clone + 'static,
+{
     /// Takes a generic function that implements [`GemCall`], and boxes it into our `routes` hashmap.
     ///
     /// May panic if an insert error occurs.
-    pub fn route(mut self, path: &str, func: impl GemCall + 'static + Sync + Send) -> Self {
-        self.routes
-            .insert(path.to_string(), Box::new(func))
-            .unwrap();
+    pub fn route(mut self, path: &str, func: impl GemCall<S> + 'static + Sync + Send) -> Self {
+        self.routes.insert(path, Box::new(func)).unwrap();
         self
+    }
+
+    /// Replace [`App`]'s unit state with State
+    pub fn state<T: Send + Sync + Clone>(self, state: T) -> App<T> {
+        App {
+            state,
+            routes: Router::default(),
+            address: self.address,
+            not_found: self.not_found,
+        }
     }
 
     /// Enter the app loop
@@ -153,7 +166,12 @@ impl App {
             Ok(route) => {
                 info!("{addr} :: ✅🔗 Found [{url}] ({n} bytes)");
 
-                let client = Client::new(url, stream.ssl().peer_certificate(), &route.params);
+                let client = Client::new(
+                    self.state.clone(),
+                    url,
+                    stream.ssl().peer_certificate(),
+                    &route.params,
+                );
                 route.value.gem_call(client).await
             }
             Err(e) => {

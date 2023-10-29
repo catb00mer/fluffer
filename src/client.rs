@@ -3,15 +3,20 @@ use openssl::{asn1::Asn1Time, x509::X509};
 use std::collections::HashMap;
 use url::Url;
 
-pub struct Client {
-    pub url: Url,
-    cert:    Option<X509>,
-    params:  HashMap<String, String>,
+pub struct Client<S = ()> {
+    pub state: S,
+    pub url:   Url,
+    cert:      Option<X509>,
+    params:    HashMap<String, String>,
 }
 
-impl Client {
-    pub fn new(url: Url, cert: Option<X509>, params: &Params<'_, '_>) -> Self {
+impl<S> Client<S>
+where
+    S: Sync + Clone,
+{
+    pub fn new(state: S, url: Url, cert: Option<X509>, params: &Params<'_, '_>) -> Self {
         Self {
+            state,
             url,
             cert,
             params: params
