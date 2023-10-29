@@ -141,7 +141,8 @@ If you're unfamiliar with matchit patterns, here's a couple
 of examples:
 
 - `"/owo/:a/:b"` defines parameters `a` and `b`, e.g: `/owo/thisisa/thisisb`
-- `"/page=:n/filter=:f` defines the parameter `n`, e.g: `/page=20/filter=date`.
+- `"/page=:n/filter=:f` defines the parameter `n`, and `f`
+  following a prefix, e.g: `/page=20/filter=date`.
 
 ***Things to keep in mind:***
 
@@ -153,6 +154,45 @@ of examples:
   single parameter, which you parse manually inside the
   route function.
 
+## 🏃 App State
+Currently, Fluffer allows you to add one piece of state that
+gets attached as a generic to [`Client`].
+
+This means you'll need to reflect the app's state in every
+reference of [`Client`], so I recommend using a type alias.
+
+``` rust
+use fluffer::App;
+use std::sync::{Arc, Mutex};
+
+// Type alias for Client<State> **highly recommended**
+type Client = fluffer::Client<Arc<Mutex<State>>>;
+
+#[derive(Default)]
+struct State {
+    visitors: u32,
+}
+
+async fn index(c: Client) -> String {
+    let mut state = c.state.lock().unwrap();
+    state.visitors += 1;
+
+    format!("Visitors: {}", state.visitors)
+}
+
+#[tokio::main]
+async fn main() {
+    let state = Arc::new(Mutex::new(State::default()));
+
+    App::default()
+        .state(state) // <- Must be called first.
+        .route("/", index)
+        .run()
+        .await
+        .unwrap()
+}
+```
+
 ## 📚 Helpful Resources
 * [Gemini spec](https://gemini.circumlunar.space/docs/specification.gmi)
 
@@ -161,6 +201,7 @@ of examples:
 * [X] Switch to openssl
 * [X] Add peer certificate to client
 * [X] Spawn threads
-* [ ] App data
+* [X] App data
+* [ ] Dynamic function bodies
 * [ ] Titan support
 
