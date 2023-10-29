@@ -53,12 +53,10 @@ impl Default for App<()> {
             String::from("127.0.0.1:1965")
         });
 
-        let not_found = String::from("🦊 Page not found.");
-
         Self {
             state: (),
             address,
-            not_found,
+            not_found: String::from("Page not found."),
             routes: Router::default(),
         }
     }
