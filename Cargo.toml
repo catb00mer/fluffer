@@ -1,13 +1,15 @@
 [package]
 name = "fluffer"
-description = "Fluffer 🦊 is a crate that aims to make writing Gemini apps fun and easy."
+description = "Fluffer 🦊 is an experimental crate that aims to make writing Gemini apps fun and easy."
 homepage = "https://github.com/catb00mer/fluffer"
 repository = "https://github.com/catb00mer/fluffer"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 authors = ["catboomer"]
 readme = "readme.md"
 license = "GPL-3.0-only"
+keywords = ["gemini"]
+categories = ["network-programming"]
 
 [dependencies]
 async-trait = "0.1.73"

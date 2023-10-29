@@ -28,3 +28,7 @@
 * Added `GemBytes` impls for `reqwest::Response` and
   `reqwest::Result<reqwest::Response>`.
 * Added an http proxy example using `reqwest` (`example/http.rs`).
+
+## 2023.10.29 - 0.2.0
+* Added mvp app state with a generic on `Client`.
+* Added example (`example/app_state.rs`).
