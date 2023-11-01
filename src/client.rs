@@ -10,10 +10,7 @@ pub struct Client<S = ()> {
     params:    HashMap<String, String>,
 }
 
-impl<S> Client<S>
-where
-    S: Sync + Clone,
-{
+impl<S> Client<S> {
     pub fn new(state: S, url: Url, cert: Option<X509>, params: &Params<'_, '_>) -> Self {
         Self {
             state,
