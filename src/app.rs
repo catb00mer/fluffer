@@ -169,6 +169,7 @@ where
                     url,
                     stream.ssl().peer_certificate(),
                     &route.params,
+                    addr,
                 );
                 route.value.gem_call(client).await
             }

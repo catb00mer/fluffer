@@ -1,6 +1,6 @@
 use matchit::Params;
 use openssl::{asn1::Asn1Time, x509::X509};
-use std::collections::HashMap;
+use std::{collections::HashMap, net::SocketAddr};
 use url::Url;
 
 pub struct Client<S = ()> {
@@ -8,10 +8,17 @@ pub struct Client<S = ()> {
     pub url:   Url,
     cert:      Option<X509>,
     params:    HashMap<String, String>,
+    ip:        SocketAddr,
 }
 
 impl<S> Client<S> {
-    pub fn new(state: S, url: Url, cert: Option<X509>, params: &Params<'_, '_>) -> Self {
+    pub fn new(
+        state: S,
+        url: Url,
+        cert: Option<X509>,
+        params: &Params<'_, '_>,
+        ip: SocketAddr,
+    ) -> Self {
         Self {
             state,
             url,
@@ -20,6 +27,7 @@ impl<S> Client<S> {
                 .iter()
                 .map(|(k, v)| (k.to_string(), v.to_string()))
                 .collect(),
+            ip,
         }
     }
 
@@ -109,5 +117,10 @@ impl<S> Client<S> {
             }
         }
         true
+    }
+
+    /// Return the client's ip address.
+    pub fn ip(&self) -> SocketAddr {
+        self.ip
     }
 }
