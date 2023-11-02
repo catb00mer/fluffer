@@ -33,6 +33,8 @@ impl<S> Client<S> {
     }
 
     /// Returns the value of a route parameter.
+    ///
+    /// **Panics:** if the parameter isn't defined.
     pub fn parameter(&self, key: &str) -> &str {
         if let Some(p) = self.params.get(key) {
             p.as_str()
