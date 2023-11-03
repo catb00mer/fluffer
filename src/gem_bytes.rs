@@ -1,6 +1,52 @@
 use crate::async_trait;
 use std::fmt::Display;
 
+/// Returns the gemtext (if any) from bytes in a type implementing [`GemBytes`].
+#[async_trait]
+pub trait ToGemtext {
+    /// Returns `Some` gemtext.
+    async fn to_gemtext(self) -> Option<String>;
+
+    /// Returns type's gemtext, otherwise writes its status in a code block.
+    async fn to_gemtext_err(self) -> String;
+}
+
+#[async_trait]
+impl<T> ToGemtext for T
+where
+    T: GemBytes + Send,
+{
+    async fn to_gemtext(self) -> Option<String> {
+        let bytes = self.gem_bytes().await;
+        if let Ok(b) = std::str::from_utf8(&bytes) {
+            if let Some((header, content)) = b.split_once("\r\n") {
+                if let Some(pos) = header.find("20 text/gemini") {
+                    if pos == 0 {
+                        return Some(content.to_string());
+                    }
+                }
+            }
+        }
+        None
+    }
+
+    async fn to_gemtext_err(self) -> String {
+        let bytes = self.gem_bytes().await;
+        if let Ok(b) = std::str::from_utf8(&bytes) {
+            if let Some((header, content)) = b.split_once("\r\n") {
+                if let Some(pos) = header.find("20 text/gemini") {
+                    if pos == 0 {
+                        return content.to_string();
+                    }
+                }
+                return format!("```\nResponse :: {header}\n```");
+            }
+            return String::from("```\ninvalid gemini response\n```");
+        }
+        String::from("```\ninvalid utf8\n```")
+    }
+}
+
 /// 💎 A trait implemented on types that can be returned as a Gemini response.
 #[async_trait]
 pub trait GemBytes {

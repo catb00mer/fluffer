@@ -16,7 +16,7 @@ pub use app::App;
 pub use client::Client;
 pub use err::AppErr;
 pub use fluff::Fluff;
-pub use gem_bytes::GemBytes;
+pub use gem_bytes::{GemBytes, ToGemtext};
 pub use gem_call::GemCall;
 
 /// Procedural macro that must be used in implementations of [`GemBytes`].
