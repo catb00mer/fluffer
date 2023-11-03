@@ -14,11 +14,17 @@ pub enum Fluff {
     /// (51): Not found
     NotFound(String),
 
+    // (30): Temporary redirect to path
+    RedirectTemporary(String),
+
     // (31): Permanent redirect to path
     RedirectPermanent(String),
 
-    // (30): Temporary redirect to path
-    RedirectTemporary(String),
+    // (40): Temporary failure.
+    FailureTemporary(String),
+
+    // (50): Permanent failure.
+    FailurePermanent(String),
 
     /// (30): Redirect to ..
     GoUp,
@@ -37,6 +43,9 @@ pub enum Fluff {
 
     /// (20): Return non-descript gemtext
     Text(String),
+
+    /// (*): Return any status that only uses a meta tag.
+    Any(u8, String),
 
     /// (20): Wait 10 seconds, and send a test response.
     ///
@@ -85,12 +94,15 @@ impl GemBytes for Fluff {
             Fluff::Input(s) => format!("10 {s}\r\n").into_bytes(),
             Fluff::RedirectTemporary(path) => format!("30 {path}\r\n").into_bytes(),
             Fluff::RedirectPermanent(path) => format!("31 {path}\r\n").into_bytes(),
+            Fluff::FailureTemporary(s) => format!("40 {s}\r\n").into_bytes(),
+            Fluff::FailurePermanent(s) => format!("50 {s}\r\n").into_bytes(),
             Fluff::GoUp => "30 ..\r\n".to_string().into_bytes(),
             Fluff::Lang { lang, body } => {
                 format!("20 text/gemini; lang={lang}\r\n{body}").into_bytes()
             }
             Fluff::Document { mime, body } => format!("20 {mime}\r\n{body}").into_bytes(),
             Fluff::Text(s) => format!("20 text/gemini\r\n{s}").into_bytes(),
+            Fluff::Any(status, meta) => format!("{status} {meta}\r\n").into_bytes(),
             Fluff::DebugWait => {
                 std::thread::sleep(std::time::Duration::from_secs(10));
                 "20 text/gemini\r\n🧵 Waited 10 seconds!\n"
