@@ -32,3 +32,16 @@
 ## 2023.10.29 - 0.2.0
 * Added mvp app state with a generic on `Client`.
 * Added example (`example/app_state.rs`).
+
+## 2023.11.02 - 0.3.0
+* Added method to retrieve client's IP. (`Client::ip`)
+* Removed fox emoji from default `not_found` message
+
+## 2023.11.05 - 0.4.0
+* Added `AsGemtext` trait.
+* Added example demonstrating how to use `AsGemtext` to
+  embed another route's response within a gemtext document
+  (`example/as_gemtext.rs`).
+* Added temporary/permanent failures to `Fluff`.
+* Added option to change `cert` and `key` path in `App`.
+* Improved gen_cert error handling.
