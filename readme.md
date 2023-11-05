@@ -68,12 +68,9 @@ impl GemBytes for Profile {
 ## 📜 Certificates
 
 ### Server
-Fluffer looks for the files `./key.pem` (private) and
-`./cert.pem` (public) at runtime. If they can't be located,
-a prompt appears to generate a key pair interactively.
-
-There's currently no way to define an alternate path to your
-pem files.
+Fluffer looks for two files at runtime (`./key.pem` and
+`./cert.pem` by default). If they can't be located, a prompt
+appears to generate them interactively.
 
 ### Client identity
 Gemini uses client certificates to facilitate identities.

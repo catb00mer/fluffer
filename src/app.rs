@@ -15,7 +15,9 @@ use url::Url;
 
 /// 🖥️ A Fluffer App
 ///
-/// *Note:* App always looks for the key and cert file at `./key.pem`, and `./cert.pem`.
+/// ## Default behavior
+///
+/// * App looks for your keypair at `./key.pem` `./cert.pem`. If
 ///
 /// * Address defaults to `127.0.0.1:1965`. You can change the address at runtime with the
 ///   `FLUFFER_ADDRESS` environment variable.
@@ -44,6 +46,10 @@ pub struct App<S = ()> {
     pub address:   String,
     pub not_found: String,
     pub routes:    Router<Box<dyn GemCall<S> + Send + Sync>>,
+    /// Path to public key
+    pub key:       String,
+    /// Path to certificate/private key
+    pub cert:      String,
 }
 
 impl Default for App<()> {
@@ -58,6 +64,8 @@ impl Default for App<()> {
             address,
             not_found: String::from("Page not found."),
             routes: Router::default(),
+            key: String::from("key.pem"),
+            cert: String::from("cert.pem"),
         }
     }
 }
@@ -74,29 +82,31 @@ where
         self
     }
 
-    /// Replace [`App`]'s unit state with State
+    /// Replace [`App`]'s unit state with State.
     pub fn state<T: Send + Sync + Clone>(self, state: T) -> App<T> {
         App {
             state,
             routes: Router::default(),
             address: self.address,
             not_found: self.not_found,
+            cert: self.cert,
+            key: self.key,
         }
     }
 
-    /// Enter the app loop
+    /// Enter the app loop.
     ///
     /// This function returns [`AppErr`] if the inital setup
     /// fails. After that, all errors are logged as `debug`, and ignored.
     pub async fn run(self) -> Result<(), AppErr> {
-        crate::interactive::gen_cert();
+        crate::interactive::gen_cert(&self.cert, &self.key)?;
 
         let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls())?;
         builder
-            .set_private_key_file("key.pem", SslFiletype::PEM)
+            .set_private_key_file(&self.key, SslFiletype::PEM)
             .map_err(|e| AppErr::Key(e))?;
         builder
-            .set_certificate_file("cert.pem", SslFiletype::PEM)
+            .set_certificate_file(&self.cert, SslFiletype::PEM)
             .map_err(|e| AppErr::Cert(e))?;
         builder.check_private_key()?;
         builder.set_verify_callback(SslVerifyMode::PEER, |_, _| true);

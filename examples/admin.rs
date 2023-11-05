@@ -60,6 +60,6 @@ async fn main() {
         .await;
 
     if let Err(e) = app {
-        eprintln!("Error: {e:?}");
+        eprintln!("Error: {e}");
     }
 }

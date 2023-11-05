@@ -3,8 +3,23 @@ pub enum AppErr {
     #[error("./cert.pem is missing or corrupt: {0}")]
     Cert(openssl::error::ErrorStack),
 
+    #[error("{0}")]
+    G(String),
+
+    #[error("Error generating certificate: {0}")]
+    RcGen(#[from] rcgen::RcgenError),
+
+    #[error("Failed to save: {0}")]
+    Save(#[from] std::io::Error),
+
+    #[error("Certificate generation stopped.")]
+    RcGenStop,
+
     #[error("./key.pem is missing or corrupt: {0}")]
     Key(openssl::error::ErrorStack),
+
+    #[error("Failed to generate certificate interactively.")]
+    GenCert,
 
     #[error("Fluffer failed to bind address: {0}")]
     Bind(std::io::Error),

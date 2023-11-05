@@ -4,15 +4,31 @@ use std::{
     io::{stdin, stdout, Write},
 };
 
+use crate::err::AppErr;
+
 const OK: &str = "\x1b[0m\x1b[33m[fluffer]\x1b[0m";
 const FAIL: &str = "\x1b[31m[fluffer]\x1b[0m";
 const PROMPT: &str = "\x1b[33;3m→ ";
 
 /// Interactively generate a certificate if one doesn't exist.
-pub fn gen_cert() {
-    // Exit if either the cert or key exists
-    if File::open("cert.pem").is_ok() || File::open("key.pem").is_ok() {
-        return;
+pub fn gen_cert(cert: &str, key: &str) -> Result<(), AppErr> {
+    match (File::open(cert).is_ok(), File::open(key).is_ok()) {
+        (false, true) => {
+            eprintln!("{FAIL} Missing certificate: [{cert}].");
+            eprintln!(
+                "{FAIL} You can move [{key}] to generate a new keypair, or relocate the missing file."
+            );
+            return Err(AppErr::RcGenStop);
+        }
+        (true, false) => {
+            eprintln!("{FAIL} Missing private key: [{key}].");
+            eprintln!(
+                "{FAIL} You can move [{cert}] to generate a new keypair, or relocate the missing file."
+            );
+            return Err(AppErr::RcGenStop);
+        }
+        (true, true) => return Ok(()),
+        (false, false) => (),
     }
 
     let stdin = stdin();
@@ -21,7 +37,7 @@ pub fn gen_cert() {
     // Y/N
     print!(
         "\n{OK} Missing certificate files!
-Expected two files: ./cert.pem and ./key.pem
+Expected two files: [{cert}] and [{key}].
 
 \x1b[1mDo you want to generate a new certificate now?\x1b[0m [y/n]
 {PROMPT}"
@@ -31,7 +47,7 @@ Expected two files: ./cert.pem and ./key.pem
     let _ = stdin.read_line(&mut yorn);
 
     if yorn != "y\n" {
-        return;
+        return Err(AppErr::RcGenStop);
     }
 
     // Prompt domain(s)
@@ -51,41 +67,21 @@ e.g. localhost,domain.tld,domain2.tld
     let gen_pair = match generate_simple_self_signed(domains) {
         Err(e) => {
             eprintln!("{FAIL} Failed to generated key pair: {e}");
-            return;
+            panic!();
         }
         Ok(o) => o,
     };
 
     // Write cert
-    match gen_pair.serialize_pem() {
-        Ok(cert) => match File::create("cert.pem") {
-            Ok(mut file) => {
-                if let Err(e) = write!(file, "{}", cert) {
-                    eprintln!("{FAIL} 📜 Failed to save cert.pem: {e}");
-                    return;
-                }
-                println!("{OK} 📜 Wrote cert.pem");
-            }
-            Err(e) => {
-                eprintln!("{FAIL} 📜 Failed to create file cert.pem: {e}");
-                return;
-            }
-        },
-        Err(e) => eprintln!("{FAIL} 📜 Failed to serialize cert.pem: {e}"),
-    }
+    let pem = gen_pair.serialize_pem()?;
+    let mut file = File::create(&cert)?;
+    write!(file, "{pem}")?;
+    println!("{OK} 📜 Wrote cert.pem");
 
     // Write key
-    match File::create("key.pem") {
-        Ok(mut file) => {
-            if let Err(e) = write!(file, "{}", gen_pair.serialize_private_key_pem()) {
-                eprintln!("{FAIL} 🔑 Failed to save key.pem: {e}");
-                return;
-            }
-            println!("{OK} 🔑 Wrote key.pem");
-        }
-        Err(e) => {
-            eprintln!("{FAIL} 🔑 Failed to create file key.pem: {e}");
-            return;
-        }
-    }
+    let mut file = File::create("key.pem")?;
+    write!(file, "{}", gen_pair.serialize_private_key_pem())?;
+    println!("{OK} 🔑 Wrote {key}");
+
+    Ok(())
 }

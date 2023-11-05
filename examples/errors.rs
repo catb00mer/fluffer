@@ -33,6 +33,6 @@ async fn main() {
 
     // << Print app errors to stderr instead of panicking
     if let Err(e) = app {
-        eprintln!("Error: {e:?}");
+        eprintln!("Error: {e}");
     }
 }
