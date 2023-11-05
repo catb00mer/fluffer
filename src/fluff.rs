@@ -44,9 +44,6 @@ pub enum Fluff {
     /// (20): Return non-descript gemtext
     Text(String),
 
-    /// (*): Return any status that only uses a meta tag.
-    Any(u8, String),
-
     /// (20): Wait 10 seconds, and send a test response.
     ///
     /// Only useful for debugging threads and trolling people.
@@ -102,7 +99,6 @@ impl GemBytes for Fluff {
             }
             Fluff::Document { mime, body } => format!("20 {mime}\r\n{body}").into_bytes(),
             Fluff::Text(s) => format!("20 text/gemini\r\n{s}").into_bytes(),
-            Fluff::Any(status, meta) => format!("{status} {meta}\r\n").into_bytes(),
             Fluff::DebugWait => {
                 std::thread::sleep(std::time::Duration::from_secs(10));
                 "20 text/gemini\r\n🧵 Waited 10 seconds!\n"
