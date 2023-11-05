@@ -18,9 +18,6 @@ pub enum AppErr {
     #[error("./key.pem is missing or corrupt: {0}")]
     Key(openssl::error::ErrorStack),
 
-    #[error("Failed to generate certificate interactively.")]
-    GenCert,
-
     #[error("Fluffer failed to bind address: {0}")]
     Bind(std::io::Error),
 
