@@ -1,6 +1,6 @@
 use url::Url;
 
-/// 📝 Represent type as gemtext.
+/// 📝 Represent a type as gemtext.
 pub trait AsGemtext {
     fn as_gemtext(&self) -> String;
 }

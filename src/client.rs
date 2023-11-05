@@ -3,6 +3,7 @@ use openssl::{asn1::Asn1Time, x509::X509};
 use std::{collections::HashMap, net::SocketAddr};
 use url::Url;
 
+/// Information about a client's request.
 #[derive(Clone)]
 pub struct Client<S = ()> {
     pub state: S,
