@@ -45,3 +45,7 @@
 * Added temporary/permanent failures to `Fluff`.
 * Added option to change `cert` and `key` path in `App`.
 * Improved gen_cert error handling.
+
+## 2023.11.05 - 0.5.0
+* Added `Static` wrapper around `GemBytes` types implement
+  `GemCall` on byte types without a closure. (`examples/static.rs`)

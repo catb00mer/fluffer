@@ -30,3 +30,23 @@ where
         (self)(client).await.gem_bytes().await
     }
 }
+
+/// A wrapper for [`GemBytes`] types to implement [`GemCall`] without a closure.
+///
+/// Example usage:
+/// ```
+/// App::default()
+///     .route("/", Static("Hellooooooo"))
+/// ```
+pub struct Static<T: GemBytes + Send + Sync + Clone>(pub T);
+
+#[async_trait]
+impl<T, S> GemCall<S> for Static<T>
+where
+    T: GemBytes + Send + Sync + Clone,
+    S: Send + Sync + Clone + 'static,
+{
+    async fn gem_call(&self, _: Client<S>) -> Vec<u8> {
+        self.0.clone().gem_bytes().await
+    }
+}
