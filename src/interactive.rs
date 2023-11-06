@@ -1,7 +1,8 @@
 use rcgen::generate_simple_self_signed;
 use std::{
-    fs::File,
+    fs::{File, Permissions},
     io::{stdin, stdout, Write},
+    os::unix::prelude::PermissionsExt,
 };
 
 use crate::err::AppErr;
@@ -80,6 +81,7 @@ e.g. localhost,domain.tld,domain2.tld
 
     // Write key
     let mut file = File::create("key.pem")?;
+    file.set_permissions(Permissions::from_mode(0o600))?;
     write!(file, "{}", gen_pair.serialize_private_key_pem())?;
     println!("{OK} 🔑 Wrote {key}");
 
