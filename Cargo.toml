@@ -21,7 +21,7 @@ rcgen = "0.11.3"
 reqwest = "0.11.22"
 sanitize-filename = "0.5.0"
 thiserror = "1.0.50"
-tokio = { version = "1.32.0", features = ["full"] }
+tokio = { version = "1.32.0", features = ["net", "macros", "io-std", "rt-multi-thread"] }
 tokio-openssl = "0.6.3"
 url = "2.4.1"
 urlencoding = "2.1.3"
