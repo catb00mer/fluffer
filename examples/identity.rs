@@ -40,7 +40,7 @@ UDhrx+oupwUUcYnSaTR3gP44+IPU05mYLI6Pf3RiNP02u5ztpTpHS91nBNrx
 
 async fn expired(c: Client) -> String {
     if c.ident_expired() {
-        "Your certificate is expired :("
+        "You either provided no certificate, or yours is expired :("
     } else {
         "Your certificate is fine! :D"
     }
