@@ -127,7 +127,7 @@ the connection's thread to panic.
 ``` rust
 App::default()
     .route("/page=:number" |c| async {
-        format!("{}", c.parameter("number").unwrap_or("no page number 💢"))
+        format!("{}", c.parameter("number"))
     })
     .run()
     .await
