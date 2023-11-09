@@ -49,3 +49,9 @@
 ## 2023.11.05 - 0.5.0
 * Added `Static` wrapper around `GemBytes` types implement
   `GemCall` on byte types without a closure. (`examples/static.rs`)
+
+## 2023.11.09 - 0.6.0
+* Removed the `AsGemtext` trait.
+* Added the `Client::render` function to replace `impl AsGemtext for Vec<u8>`.
+* Implemented `GemBytes` for `anyhow::Error`.
+* Set permissions to `600` for generated private key file.
