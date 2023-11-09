@@ -171,16 +171,12 @@ impl GemBytes for reqwest::Response {
     }
 }
 
-/// 💎 GemBytes implementation for rapid testing with [`anyhow::Result`], where any errors get
-/// returned as a gemini failure.
+/// 💎 GemBytes implementation for rapid route testing with [`anyhow`].
 ///
 /// Please don't use this in production. Error messages may contain sensitive information.
 #[async_trait]
-impl<T: GemBytes + Send> GemBytes for anyhow::Result<T> {
+impl GemBytes for anyhow::Error {
     async fn gem_bytes(self) -> Vec<u8> {
-        match self {
-            Ok(o) => o.gem_bytes().await,
-            Err(e) => format!("40 {e}\r\n").into_bytes(),
-        }
+        format!("40 {}\r\n", self).into_bytes()
     }
 }
