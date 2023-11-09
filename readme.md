@@ -199,6 +199,5 @@ async fn main() {
 * [X] Add peer certificate to client
 * [X] Spawn threads
 * [X] App data
-* [ ] Dynamic function bodies
 * [ ] Titan support
 
