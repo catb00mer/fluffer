@@ -42,14 +42,16 @@ use url::Url;
 /// .await
 /// ```
 pub struct App<S = ()> {
-    pub state:     S,
-    pub address:   String,
-    pub not_found: String,
-    pub routes:    Router<Box<dyn GemCall<S> + Send + Sync>>,
+    pub state:       S,
+    pub address:     String,
+    pub not_found:   String,
+    pub routes:      Router<Box<dyn GemCall<S> + Send + Sync>>,
     /// Path to public key
-    pub key:       String,
+    pub key:         String,
     /// Path to certificate/private key
-    pub cert:      String,
+    pub cert:        String,
+    /// Whether to generate certificates interactively (true by default)
+    pub interactive: bool,
 }
 
 impl Default for App<()> {
@@ -66,6 +68,7 @@ impl Default for App<()> {
             routes: Router::default(),
             key: String::from("key.pem"),
             cert: String::from("cert.pem"),
+            interactive: true,
         }
     }
 }
@@ -91,6 +94,7 @@ where
             not_found: self.not_found,
             cert: self.cert,
             key: self.key,
+            interactive: self.interactive,
         }
     }
 
@@ -99,7 +103,9 @@ where
     /// This function returns [`AppErr`] if the inital setup
     /// fails. After that, all errors are logged as `debug`, and ignored.
     pub async fn run(self) -> Result<(), AppErr> {
-        crate::interactive::gen_cert(&self.cert, &self.key)?;
+        if self.interactive {
+            crate::interactive::gen_cert(&self.cert, &self.key)?;
+        }
 
         let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls())?;
         builder
