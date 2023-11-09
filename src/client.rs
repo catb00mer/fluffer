@@ -13,7 +13,7 @@ pub struct Client<S = ()> {
     ip:        SocketAddr,
 }
 
-impl<S> Client<S> {
+impl<S: Clone> Client<S> {
     pub fn new(
         state: S,
         url: Url,
@@ -126,5 +126,28 @@ impl<S> Client<S> {
     /// Return the client's ip address.
     pub fn ip(&self) -> SocketAddr {
         self.ip
+    }
+
+    /// Render the return value of another route as gemtext.
+    ///
+    /// The client info from this route is copied.
+    ///
+    /// If the response of the route function isn't valid
+    /// gemtext, then the status is formatted into a code
+    /// block.
+    pub async fn render(&self, route: impl crate::GemCall<S>) -> String {
+        let bytes = route.gem_call(self.clone()).await;
+        if let Ok(b) = std::str::from_utf8(&bytes) {
+            if let Some((header, content)) = b.split_once("\r\n") {
+                if let Some(pos) = header.find("20 text/gemini") {
+                    if pos == 0 {
+                        return content.to_string();
+                    }
+                }
+                return format!("```\n{header}\n```");
+            }
+            return String::from("```\ninvalid gemini response\n```");
+        }
+        String::from("```\ninvalid utf8\n```")
     }
 }
