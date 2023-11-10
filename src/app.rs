@@ -56,10 +56,7 @@ pub struct App<S = ()> {
 
 impl Default for App<()> {
     fn default() -> Self {
-        let address = std::env::var("FLUFFER_ADDRESS").unwrap_or_else(|e| {
-            warn!("❕ {e}: FLUFFER_ADDRESS. Defaulting to `127.0.0.1:1965`...");
-            String::from("127.0.0.1:1965")
-        });
+        let address = std::env::var("FLUFFER_ADDRESS").unwrap_or(String::from("127.0.0.1:1965"));
 
         Self {
             state: (),
