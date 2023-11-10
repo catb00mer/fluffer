@@ -192,6 +192,7 @@ async fn main() {
 
 ## 📚 Helpful Resources
 * [Gemini spec](https://gemini.circumlunar.space/docs/specification.gmi)
+* [Examples](https://github.com/catb00mer/fluffer/tree/main/examples)
 
 ## 📋 Todo
 * [X] Async for route functions
