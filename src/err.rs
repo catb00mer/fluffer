@@ -3,9 +3,6 @@ pub enum AppErr {
     #[error("./cert.pem is missing or corrupt: {0}")]
     Cert(openssl::error::ErrorStack),
 
-    #[error("{0}")]
-    G(String),
-
     #[error("Error generating certificate: {0}")]
     RcGen(#[from] rcgen::RcgenError),
 
