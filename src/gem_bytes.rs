@@ -64,6 +64,33 @@ where
     }
 }
 
+/// 💎 Tuple for composing responses with [`trotter::Status`].
+///
+/// For example: `(Status::Success, "text/gemini", "# Tuple test :o")`
+#[async_trait]
+impl<META, BODY> GemBytes for (trotter::Status, META, BODY)
+where
+    META: Display + Send,
+    BODY: Display + Send,
+{
+    async fn gem_bytes(self) -> Vec<u8> {
+        format!("{} {}\r\n{}", self.0.value(), self.1, self.2).into_bytes()
+    }
+}
+
+/// 💎 Tuple for responses containing [`trotter::Status`] and `meta`.
+///
+/// For example: `(Status::NotFound, "Page couldn't be found")`
+#[async_trait]
+impl<META> GemBytes for (trotter::Status, META)
+where
+    META: Display + Send,
+{
+    async fn gem_bytes(self) -> Vec<u8> {
+        format!("{} {}\r\n", self.0.value(), self.1).into_bytes()
+    }
+}
+
 /// 💎 An implementation of GemBytes which returns `&str` as gemtext.
 #[async_trait]
 impl GemBytes for &str {

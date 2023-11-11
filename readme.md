@@ -2,6 +2,8 @@
 Fluffer is an *experimental* crate that aims to make writing
 Gemini apps fun and easy.
 
+I'm also working on [`trotter`], a crate for gemini clients.
+
 ## 🗼 Design
 Similar to Axum, Fluffer routes are generic functions that
 can return anything that implements the [`GemBytes`] trait.

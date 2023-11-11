@@ -21,3 +21,6 @@ pub use gem_call::{GemCall, Static};
 
 /// Procedural macro that must be used in implementations of [`GemBytes`].
 pub use async_trait::async_trait;
+
+/// Exported from [`trotter`].
+pub use trotter::Status;

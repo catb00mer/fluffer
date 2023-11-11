@@ -191,6 +191,7 @@ dependencies = [
  "thiserror",
  "tokio",
  "tokio-openssl",
+ "trotter",
  "url",
  "urlencoding",
 ]
@@ -1146,6 +1147,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c06d3da6113f116aaee68e4d601191614c9053067f9ab7f6edbcb161237daa54"
 dependencies = [
  "once_cell",
+]
+
+[[package]]
+name = "trotter"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4a385074d477b1a278d044c7d09587f09e388236f37f75d32388f690a8ef772e"
+dependencies = [
+ "openssl",
+ "thiserror",
+ "tokio",
+ "tokio-openssl",
+ "url",
 ]
 
 [[package]]
