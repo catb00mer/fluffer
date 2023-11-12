@@ -137,17 +137,30 @@ impl<S: Clone> Client<S> {
     /// block.
     pub async fn render(&self, route: impl crate::GemCall<S>) -> String {
         let bytes = route.gem_call(self.clone()).await;
-        if let Ok(b) = std::str::from_utf8(&bytes) {
-            if let Some((header, content)) = b.split_once("\r\n") {
-                if let Some(pos) = header.find("20 text/gemini") {
-                    if pos == 0 {
-                        return content.to_string();
-                    }
-                }
-                return format!("```\n{header}\n```");
+        let Ok(b) = std::str::from_utf8(&bytes) else {
+            return String::from("```\nInvalid gemini response.\n```");
+        };
+
+        let Some((header, content)) = b.split_once("\r\n") else {
+            return String::from("```\nInvalid gemini response.\n```");
+        };
+
+        // Return the content of gemtext responses.
+        if let Some(pos) = header.find("20 text/gemini") {
+            if pos == 0 {
+                return content.to_string();
             }
-            return String::from("```\ninvalid gemini response\n```");
         }
-        String::from("```\ninvalid utf8\n```")
+
+        let Some((status, meta)) = header.split_once(' ') else {
+            return String::from("```\nInvalid gemini response.\n```");
+        };
+
+        let Ok(status) = status.parse::<u8>() else {
+            return String::from("```\nInvalid gemini response.\n```");
+        };
+
+        let status: trotter::Status = status.into();
+        format!("```\n{status} {meta}\n```")
     }
 }
