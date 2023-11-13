@@ -87,6 +87,7 @@ async fn roll(c: Client) -> Result<Fluff, RollError> {
     };
 
     // Get bonus, and strip it from input
+    let input = input.replace(' ', "");
     let (input, bonus) = {
         if let Some((input, bonus)) = input.rsplit_once('+') {
             (input.to_string(), bonus.parse::<i32>().unwrap_or(0))
@@ -101,8 +102,6 @@ async fn roll(c: Client) -> Result<Fluff, RollError> {
     let Some((roll_count, sides)) = input.rsplit_once('d') else {
         return Err(RollError::BadRoll);
     };
-
-    let (roll_count, sides) = (roll_count.trim(), sides.trim());
 
     // Parse both parts of the split into i32
     let roll_count = roll_count.parse::<i32>().unwrap_or(1);
