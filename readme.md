@@ -12,8 +12,8 @@ There are some helpful implementations out of the box, so
 please consult [`GemBytes`] and [`Fluff`] while you
 experiment.
 
-Also, this crate has a lot of examples for you to check out.
-Including a dice roller app.
+Also, this crate has a lot of [examples](https://github.com/catb00mer/fluffer/tree/main/examples)
+for you to check out. Including a dice roller app.
 
 Here is a basic example of a Fluffer app.
 
