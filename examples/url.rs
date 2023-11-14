@@ -1,15 +1,11 @@
-use fluffer::{App, Client};
+use fluffer::{App, Client, Fluff};
 
-async fn user(c: Client) -> (u8, &'static str, String) {
+async fn echo(c: Client) -> Fluff {
     if let Some(input) = c.input() {
-        (20, "text/gemini", format!("## Input\n\n```\n{input}\n```"))
+        Fluff::Text(format!("The cave echoes...\n\n{input}"))
     } else {
-        (10, "user input:", "".to_string())
+        Fluff::Input("Enter some input".to_string())
     }
-}
-
-async fn params(c: Client) -> String {
-    c.parameter("p").to_string()
 }
 
 async fn page(c: Client) -> String {
@@ -20,7 +16,6 @@ async fn page(c: Client) -> String {
         "entry 23", "entry 24", "entry 25", "entry 26", "entry 27", "entry 28", "entry 29",
     ];
 
-    // Get the page query (?p=n), or default to 1
     let num: usize = c.parameter("p").parse::<usize>().unwrap_or(0);
 
     let entries_per_page: usize = 5;
@@ -53,11 +48,8 @@ async fn main() {
     pretty_env_logger::init();
 
     App::default()
-        .route("/", |_| async {
-            "=> /user?q=hi Input\n=> /params/20 Parameters\n=> /page/0 Paging Example"
-        })
-        .route("/user", user)
-        .route("/params/:p", params)
+        .route("/", |_| async { "=> /echo Echo input\n=> /page/0 Page" })
+        .route("/echo", echo)
         .route("/page/:p", page)
         .run()
         .await
