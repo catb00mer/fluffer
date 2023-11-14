@@ -182,3 +182,21 @@ impl GemBytes for anyhow::Error {
         format!("40 {}\r\n", self).into_bytes()
     }
 }
+
+/// 💎 GemBytes implementation to quickly proxy a [`trotter`] response.
+///
+/// Please don't use this in production. Error messages may contain sensitive information.
+#[async_trait]
+impl GemBytes for trotter::Response {
+    async fn gem_bytes(mut self) -> Vec<u8> {
+        let trotter::Response {
+            status,
+            meta,
+            mut content,
+        } = self;
+
+        let mut o = format!("{status} {meta}\r\n").into_bytes();
+        o.append(&mut content);
+        o
+    }
+}

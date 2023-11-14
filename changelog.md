@@ -55,3 +55,9 @@
 * Added the `Client::render` function to replace `impl AsGemtext for Vec<u8>`.
 * Implemented `GemBytes` for `anyhow::Error`.
 * Set permissions to `600` for generated private key file.
+
+## 2023.11.09 - 0.7.0
+* Added re-export of `trotter::Status`
+* Changed tuple impls of `GemBytes` to use `Into<u8>`
+  generic so it can support `trotter::Status`
+* Added `GemBytes` impl of `trotter::Response`
