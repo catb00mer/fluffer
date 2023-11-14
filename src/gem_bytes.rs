@@ -41,13 +41,14 @@ where
 ///
 /// For example: `(20, "text/gemini", "# Tuple test :o")`
 #[async_trait]
-impl<META, BODY> GemBytes for (u8, META, BODY)
+impl<STATUS, META, BODY> GemBytes for (STATUS, META, BODY)
 where
+    STATUS: Into<u8> + Send,
     META: Display + Send,
     BODY: Display + Send,
 {
     async fn gem_bytes(self) -> Vec<u8> {
-        format!("{} {}\r\n{}", self.0, self.1, self.2).into_bytes()
+        format!("{} {}\r\n{}", self.0.into(), self.1, self.2).into_bytes()
     }
 }
 
@@ -55,39 +56,13 @@ where
 ///
 /// For example: `(51, "Page couldn't be found")`
 #[async_trait]
-impl<META> GemBytes for (u8, META)
+impl<STATUS, META> GemBytes for (STATUS, META)
 where
+    STATUS: Into<u8> + Send,
     META: Display + Send,
 {
     async fn gem_bytes(self) -> Vec<u8> {
-        format!("{} {}\r\n", self.0, self.1).into_bytes()
-    }
-}
-
-/// 💎 Tuple for composing responses with [`trotter::Status`].
-///
-/// For example: `(Status::Success, "text/gemini", "# Tuple test :o")`
-#[async_trait]
-impl<META, BODY> GemBytes for (trotter::Status, META, BODY)
-where
-    META: Display + Send,
-    BODY: Display + Send,
-{
-    async fn gem_bytes(self) -> Vec<u8> {
-        format!("{} {}\r\n{}", self.0.value(), self.1, self.2).into_bytes()
-    }
-}
-
-/// 💎 Tuple for responses containing [`trotter::Status`] and `meta`.
-///
-/// For example: `(Status::NotFound, "Page couldn't be found")`
-#[async_trait]
-impl<META> GemBytes for (trotter::Status, META)
-where
-    META: Display + Send,
-{
-    async fn gem_bytes(self) -> Vec<u8> {
-        format!("{} {}\r\n", self.0.value(), self.1).into_bytes()
+        format!("{} {}\r\n", self.0.into(), self.1).into_bytes()
     }
 }
 
