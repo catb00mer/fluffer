@@ -1,4 +1,4 @@
-use rcgen::generate_simple_self_signed;
+use rcgen::{CertificateParams, DistinguishedName, DnType, DnValue};
 use std::{
     fs::{File, Permissions},
     io::{stdin, stdout, Write},
@@ -43,9 +43,9 @@ Expected two files: [{cert}] and [{key}].
 \x1b[1mDo you want to generate a new certificate now?\x1b[0m [y/n]
 {PROMPT}"
     );
-    let _ = stdout.flush();
+    stdout.flush()?;
     let mut yorn = String::new();
-    let _ = stdin.read_line(&mut yorn);
+    stdin.read_line(&mut yorn)?;
 
     if yorn != "y\n" {
         return Err(AppErr::RcGenStop);
@@ -54,24 +54,41 @@ Expected two files: [{cert}] and [{key}].
     // Prompt domain(s)
     print!(
         "\n{OK} Enter the domain name(s) you will be using.
-e.g. localhost,domain.tld,domain2.tld
+e.g. localhost, *.localhost, sub.example.com
 {PROMPT}"
     );
-    let _ = stdout.flush();
-    let mut dlist = String::new();
-    let _ = stdin.read_line(&mut dlist);
+    stdout.flush()?;
 
-    let domains: Vec<String> = dlist.split(',').map(|d| d.trim().to_string()).collect();
+    let mut domains = String::new();
+    stdin.read_line(&mut domains)?;
 
+    let mut domains: Vec<String> = domains.split(',').map(|d| d.trim().to_string()).collect();
+
+    if domains.iter().all(|x| x.is_empty()) {
+        return Err(AppErr::RcGenNoDomains);
+    }
+
+    // Preview domains
     println!("\x1b[3m{domains:#?}\x1b[0m");
 
-    let gen_pair = match generate_simple_self_signed(domains) {
-        Err(e) => {
-            eprintln!("{FAIL} Failed to generated key pair: {e}");
-            panic!();
-        }
-        Ok(o) => o,
-    };
+    // Use the first domain as the subject name
+    let subject_name = domains.get(0).ok_or(AppErr::RcGenNoDomains)?.clone();
+
+    // Remove subject name from domains, and use the remaining ones as
+    // alt names
+    domains.reverse();
+    domains.pop();
+    let subject_alt_names = domains;
+
+    // Create params
+    let mut params = CertificateParams::new(subject_alt_names);
+    params.distinguished_name = DistinguishedName::new();
+    params
+        .distinguished_name
+        .push(DnType::CommonName, DnValue::Utf8String(subject_name));
+
+    // Generate keypair
+    let gen_pair = rcgen::Certificate::from_params(params)?;
 
     // Write cert
     let pem = gen_pair.serialize_pem()?;

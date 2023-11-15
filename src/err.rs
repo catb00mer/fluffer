@@ -6,6 +6,9 @@ pub enum AppErr {
     #[error("Error generating certificate: {0}")]
     RcGen(#[from] rcgen::RcgenError),
 
+    #[error("You didn't enter any domains")]
+    RcGenNoDomains,
+
     #[error("Failed to save: {0}")]
     Save(#[from] std::io::Error),
 
