@@ -61,3 +61,10 @@
 * Changed tuple impls of `GemBytes` to use `Into<u8>`
   generic so it can support `trotter::Status`
 * Added `GemBytes` impl of `trotter::Response`
+
+## 2023.11.15 - 0.7.1
+* Interactive certs now use first domain as primary `CN`
+  subject name.
+* Interactive cert prompt now properly exits if you enter no
+  domains
+* Made client properties `cert` and `params` public

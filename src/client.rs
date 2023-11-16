@@ -6,11 +6,11 @@ use url::Url;
 /// Information about a client's request.
 #[derive(Clone)]
 pub struct Client<S = ()> {
-    pub state: S,
-    pub url:   Url,
-    cert:      Option<X509>,
-    params:    HashMap<String, String>,
-    ip:        SocketAddr,
+    pub state:  S,
+    pub url:    Url,
+    pub cert:   Option<X509>,
+    pub params: HashMap<String, String>,
+    ip:         SocketAddr,
 }
 
 impl<S: Clone> Client<S> {
