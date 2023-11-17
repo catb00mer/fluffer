@@ -68,3 +68,6 @@
 * Interactive cert prompt now properly exits if you enter no
   domains
 * Made client properties `cert` and `params` public
+
+## 2023.11.17 - 0.8.0
+* Include primary domain in alt names.

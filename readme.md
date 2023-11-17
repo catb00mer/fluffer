@@ -2,7 +2,9 @@
 Fluffer is an *experimental* crate that aims to make writing
 Gemini apps fun and easy.
 
-I'm also working on [`trotter`], a crate for gemini clients.
+See also:
+- [`trotter`]: A crate for gemini clients.
+- [schuifkoppel](https://codeberg.org/FiskFan1999/schuifkoppel): A reverse-proxy for gemini.
 
 ## 🗼 Design
 Similar to Axum, Fluffer routes are generic functions that
@@ -202,5 +204,6 @@ async fn main() {
 * [X] Add peer certificate to client
 * [X] Spawn threads
 * [X] App data
+* [ ] Add more options to certificate generation
 * [ ] Titan support
 
