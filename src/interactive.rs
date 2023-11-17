@@ -62,7 +62,7 @@ e.g. localhost, *.localhost, sub.example.com
     let mut domains = String::new();
     stdin.read_line(&mut domains)?;
 
-    let mut domains: Vec<String> = domains.split(',').map(|d| d.trim().to_string()).collect();
+    let domains: Vec<String> = domains.split(',').map(|d| d.trim().to_string()).collect();
 
     if domains.iter().all(|x| x.is_empty()) {
         return Err(AppErr::RcGenNoDomains);
@@ -73,11 +73,6 @@ e.g. localhost, *.localhost, sub.example.com
 
     // Use the first domain as the subject name
     let subject_name = domains.get(0).ok_or(AppErr::RcGenNoDomains)?.clone();
-
-    // Remove subject name from domains, and use the remaining ones as
-    // alt names
-    domains.reverse();
-    domains.pop();
     let subject_alt_names = domains;
 
     // Create params
