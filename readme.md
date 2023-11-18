@@ -5,4 +5,4 @@ Gemini apps fun and easy.
 ## Moved to Codeberg
 Development happens on Codeberg.
 
-[>> Go here <<](https://codeberg.com/catboomer/fluffer)
+[>> Go here <<](https://codeberg.org/catboomer/fluffer)
